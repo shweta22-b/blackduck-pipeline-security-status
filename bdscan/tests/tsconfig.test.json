@@ -1,0 +1,19 @@
+{   
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "jest"
+        ]
+    },
+    "files": ["src/index.test.ts"],
+    "include": [
+        "src/lib/*",
+        "src/models/*",
+        "src/services/*",
+        "src/index.ts",
+        "src/index.test.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

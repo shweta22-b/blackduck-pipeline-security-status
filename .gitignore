@@ -1,0 +1,3 @@
+node_modules
+bdscan/dist
+*.vsix
