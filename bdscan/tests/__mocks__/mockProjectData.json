@@ -1,0 +1,40 @@
+{
+    "totalCount": 1,
+    "items": [{
+    "name": "ProjectName",
+    "projectLevelAdjustments": true,
+        "cloneCategories": ["COMPONENT_DATA",
+            "VULN_DATA"],
+    "customSignatureEnabled": false,
+    "customSignatureDepth": 5,
+    "deepLicenseDataEnabled": false,
+    "snippetAdjustmentApplied": false,
+    "licenseConflictsEnabled": false,
+    "createdAt": "2021-07-13T17:00:00.000Z",
+    "createdBy": "jbeck@allegion.com",
+    "createdByUser": "https://localhost/api/users/USERGUID123",
+    "updatedAt": "2021-07-13T17:00:00.000Z",
+    "updatedBy": "jbeck@allegion.com",
+    "updatedByUser": "https://localhost/api/users/USERGUID123",
+    "source": "CUSTOM",
+    "_meta": {
+        "allow": ["GET"],
+        "href": "https://localhost/api/projects/PROJECTGUID123",
+        "links": [ {
+            "rel": "versions",
+            "href": "https://localhost/api/projects/PROJECTGUID123/versions/VERSIONGUID123"
+            }]
+        }
+    }],
+    "appliedFilters": [],
+    "_meta": {
+        "allow": ["GET"],
+        "href": "https://localhost:5000",
+        "links": [{
+            "rel": "versions",
+            "href": "https://localhost/api/projects/PROJECTGUID123/versions/VERSIONGUID123",
+            "name": "subscribed",
+            "label": "Subscribed"
+        }]
+    }
+}

@@ -3,6 +3,11 @@ export interface Count {
     count: number
 }
 
+export interface PolicyStatusSummaries {
+    name: string,
+    status: string
+}
+
 export interface PolicyStatus {
     name: string,
     status: string

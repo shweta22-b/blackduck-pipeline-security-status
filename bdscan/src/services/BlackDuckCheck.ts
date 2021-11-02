@@ -1,28 +1,16 @@
-import * as task from 'azure-pipelines-task-lib/task';
-import { DetectADOConstants } from '../lib/BlackDuckConstants';
 import { IBlackDuckConfig } from '../models/IBlackDuckConfig';
 import { IBlackDuckToken } from '../models/IBlackDuckToken';
 import { IBlackDuckProject } from '../models/IBlackDuckProject';
 import { IBlackDuckVersion } from '../models/IBlackDuckVersion';
 import { IBlackDuckViolations } from '../models/IBlackDuckViolations';
 import { IRequestOptions } from '../models/IRequestOptions';
-import { Count } from '../models/ISharedItems';
+import { Count, PolicyStatusSummaries } from '../models/ISharedItems';
 import * as https from 'https';
 
 class BlackDuckCheck {
     constructor(){}
 
-    async getBlackDuckCredentials(bdService): Promise<IBlackDuckConfig> {
-    const bdUrl: string = task.getEndpointUrl(bdService, false);
-    const bdToken: string = task.getEndpointAuthorizationParameter(bdService, DetectADOConstants.BLACKDUCK_API_TOKEN, false);
-
-        return {
-            blackduckUrl: bdUrl,
-            blackduckApiToken: bdToken
-        }
-    }
-
-    async authenticate(_baseUrl, _bdCreds: IBlackDuckConfig): Promise<IBlackDuckToken> {
+    async authenticate(_baseUrl, _bdToken: string): Promise<IBlackDuckToken> {
     console.log("Authenticating...");
     let options: IRequestOptions = {
         hostname: _baseUrl,
@@ -30,7 +18,7 @@ class BlackDuckCheck {
         path: '/api/tokens/authenticate',
         method: 'POST',
         headers: {
-            'Authorization': `token ${_bdCreds.blackduckApiToken}`,
+            'Authorization': `token ${_bdToken}`,
             'Accept': 'application/vnd.blackducksoftware.user-4+json'
         }
     }
@@ -73,19 +61,42 @@ class BlackDuckCheck {
         return await this.getRequest(_url, options);
     }
 
-    async checkVersionSecurityRisks(riskProfiles: Count[] | undefined): Promise<boolean> {
+    async checkViolations(violationProfiles: Count[] | undefined): Promise<boolean> {
         let value = false;
-        if (riskProfiles === undefined)
+        if (violationProfiles === undefined)
         {
             return true
         }
-        riskProfiles.forEach(item => {
+        violationProfiles.forEach(item => {
             if (item.countType.toUpperCase() == 'CRITICAL' || item.countType.toUpperCase() == 'HIGH')
             {
                 if (item.count > 0)
                 {
                     value = true;
                 }
+            }
+        });
+        if (value)
+        {
+            return true
+        }
+        else
+        {
+            return false
+        }
+    }
+
+    async checkPolicy(policyProfile: PolicyStatusSummaries[]): Promise<boolean> {
+        let value = false;
+        if (policyProfile === undefined)
+        {
+            return true
+        }
+        policyProfile.forEach(item => {
+            if (item.status.toUpperCase() == 'IN_VIOLATION')
+            {
+
+                value = true;
             }
         });
         if (value)
