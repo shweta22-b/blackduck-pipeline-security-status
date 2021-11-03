@@ -3,8 +3,9 @@ import { DetectADOConstants } from './lib/BlackDuckConstants';
 import {IBlackDuckConfig} from './models/IBlackDuckConfig';
 import { IBlackDuckToken } from './models/IBlackDuckToken';
 import { IBlackDuckProject } from './models/IBlackDuckProject';
+import { IRiskState } from './models/IRiskState';
 import { IBlackDuckVersion } from './models/IBlackDuckVersion';
-import { blackduckCheck } from './services/BlackDuckCheck';
+import { BlackDuckCheck } from './services/BlackDuckCheck';
 
 async function run() {
     try {
@@ -20,57 +21,37 @@ async function run() {
         let bdCreds: IBlackDuckConfig = await getBlackDuckCredentials(bdService);
         task.setSecret(bdCreds.blackduckApiToken);
         
-        /* Get Bearer Token */
-        let bearerResponse: IBlackDuckToken = await blackduckCheck.authenticate(baseUrl, bdCreds.blackduckApiToken);
-        task.setSecret(bearerResponse.bearerToken);
-        
-        /* Get specific project  */
-        let projectUrl = `https://${baseUrl}/api/projects?q=name:${bdProjectName}`;
-        let projectDetails: IBlackDuckProject = await blackduckCheck.getProjects(projectUrl, bearerResponse);
-        
-        /* Get specific version */
-        let versionUrl = `${projectDetails.items[0]._meta.href}/versions?q=versionName:${bdVersionName}`;
-        let versionDetails: IBlackDuckVersion = await blackduckCheck.getVersions(versionUrl, bearerResponse);
+        /* Run BlackDuck API Calls */
+        let blackduckCheck = new BlackDuckCheck(bdCreds.blackduckApiToken, bdProjectName, bdVersionName, baseUrl);
+        let blackDuckData:IBlackDuckVersion = await blackduckCheck.run();
         
         /* Check licenses */
-        let versionLicenseRisk = versionDetails.items[0].licenseRiskProfile.counts;
-        let licenseCheck: boolean = await blackduckCheck.checkViolations(versionLicenseRisk);
-        if (licenseCheck)
-        {
-            console.log("A critical or high license risk detected");
-            task.setResult(task.TaskResult.Failed, "A critical or high license risk detected", true);
-        }
-        else
-        {
-            console.log("No critical or high license risk detected");
-            task.setResult(task.TaskResult.Succeeded, "No critical or high license risk detected", true);
+        const failOnLicenseSelection = task.getBoolInput('failOnLicenseRisks', false);
+        if (failOnLicenseSelection){
+            const licenseCheck = await blackduckCheck.failOnLicenseRisks(blackDuckData);
+            if (licenseCheck.risk){
+                task.setResult(task.TaskResult.Failed, licenseCheck.message, true);
+            }
         }
 
-        /* Version Check */
-        let versionSecurityRisk = versionDetails.items[0].securityRiskProfile.counts;
-        let severityCheck: boolean = await blackduckCheck.checkViolations(versionSecurityRisk);
-        if (severityCheck){
-            console.log("A critical or high vulnerability detected");
-            task.setResult(task.TaskResult.Failed, "A critical or high vulnerability detected", true);
-        }
-        else {
-            console.log("No critical or high security errors detected");
-            task.setResult(task.TaskResult.Succeeded, "No critical or high security errors detected", true);
+        /* Security check*/
+        const failOnSecuritySelection = task.getBoolInput('failOnSecurityRisks', false)
+        if (failOnSecuritySelection){
+            let securityCheck:IRiskState = await blackduckCheck.failOnSecurityRisks(blackDuckData);
+            if (securityCheck.risk){
+                task.setResult(task.TaskResult.Failed, securityCheck.message, true);
+            }
         }
 
         /* Policy check */
-        let policyVersionRisk = versionDetails.items[0].policyStatusSummaries;
-        let poilicyCheck: boolean = await blackduckCheck.checkPolicy(policyVersionRisk);
-        if (poilicyCheck)
-        {
-            console.log("A policy shows as Failure");
-            task.setResult(task.TaskResult.Failed, "A critical or high vulnerability detected", true);
+        const failOnPolicySelection = task.getBoolInput('failOnPolicyViolations', false);
+        if (failOnPolicySelection){
+            let policyCheck:IRiskState = await blackduckCheck.failOnPolicyViolations(blackDuckData);
+            if (policyCheck.risk) {
+                task.setResult(task.TaskResult.Failed, policyCheck.message);
+            }
         }
-        else
-        {
-            console.log("No critical or high security errors detected");
-            task.setResult(task.TaskResult.Succeeded, "No critical or high security errors detected", true);
-        }
+        task.setResult(task.TaskResult.Succeeded, "Black Duck scan complete. No checks failed.")
     }
     catch (err) {
         task.setResult(task.TaskResult.Failed, err.message);
@@ -88,3 +69,6 @@ async function getBlackDuckCredentials(bdService): Promise < IBlackDuckConfig > 
         blackduckApiToken: bdToken
     }
 }
+
+
+

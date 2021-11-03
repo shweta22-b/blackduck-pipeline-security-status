@@ -45,6 +45,30 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Provide a comma seperated list of component names in Black Duck to exclude from build failures"
+        },
+        {
+            "name": "failOnSecurityRisks",
+            "type": "boolean",
+            "label": "Fail on security risks",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "Fail task on CRITICAL or HIGH security risks. Defaults to true."
+        },
+        {
+            "name": "failOnLicenseRisks",
+            "type": "boolean",
+            "label": "Fail on license risks",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Fail task on HIGH license risks."
+        },
+        {
+            "name": "failOnPolicyViolations",
+            "type": "boolean",
+            "label": "Fail on policy violations",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Fail task on policy violations."
         }
     ],
     "execution": {

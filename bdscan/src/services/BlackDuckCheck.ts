@@ -1,16 +1,28 @@
-import { IBlackDuckConfig } from '../models/IBlackDuckConfig';
 import { IBlackDuckToken } from '../models/IBlackDuckToken';
 import { IBlackDuckProject } from '../models/IBlackDuckProject';
 import { IBlackDuckVersion } from '../models/IBlackDuckVersion';
 import { IBlackDuckViolations } from '../models/IBlackDuckViolations';
 import { IRequestOptions } from '../models/IRequestOptions';
+import { IRiskState } from '../models/IRiskState';
 import { Count, PolicyStatusSummaries } from '../models/ISharedItems';
 import * as https from 'https';
+import { reject } from 'q';
+import { resolve } from 'path/posix';
 
-class BlackDuckCheck {
-    constructor(){}
+export class BlackDuckCheck {
+    private bdToken: string;
+    public bdProjectName: string;
+    public bdVersionName: string;
+    public baseUrl: string;
+    
+    constructor(_bdToken:string, _bdProjectName:string, _bdVersionName:string, _baseUrl:string){
+        this.bdToken = _bdToken;
+        this.bdProjectName = _bdProjectName;
+        this.bdVersionName = _bdVersionName;
+        this.baseUrl = _baseUrl;
+    }
 
-    async authenticate(_baseUrl, _bdToken: string): Promise<IBlackDuckToken> {
+    private async authenticate(_baseUrl, _bdToken: string): Promise<string> {
     console.log("Authenticating...");
     let options: IRequestOptions = {
         hostname: _baseUrl,
@@ -18,43 +30,44 @@ class BlackDuckCheck {
         path: '/api/tokens/authenticate',
         method: 'POST',
         headers: {
-            'Authorization': `token ${_bdToken}`,
+            'Authorization': `token ${this.bdToken}`,
             'Accept': 'application/vnd.blackducksoftware.user-4+json'
         }
     }
-        return await this.request(options);
+        let bearerResponse: IBlackDuckToken = await this.request(options);
+        return bearerResponse.bearerToken;
     }
 
-        async getProjects(_url: string, _bearerResponse: IBlackDuckToken): Promise<IBlackDuckProject> {
+        async getProjects(_url: string, _bearerToken: string): Promise<IBlackDuckProject> {
         console.log("Get Projects...");
         let options: IRequestOptions = {
             port: 443,
             headers: {
-                'Authorization': `Bearer ${_bearerResponse.bearerToken}`,
+                'Authorization': `Bearer ${_bearerToken}`,
                 'Accept': 'application/vnd.blackducksoftware.project-detail-4+json'
             }
         }
         return await this.getRequest(_url, options);
     }
 
-    async getVersions(_url: string, _bearerResponse: IBlackDuckToken): Promise<IBlackDuckVersion> {
+    async getVersions(_url: string, _bearerToken: string): Promise<IBlackDuckVersion> {
         console.log("Get Versions...");
         let options: IRequestOptions = {
             port: 443,
             headers: {
-                'Authorization': `Bearer ${_bearerResponse.bearerToken}`,
+                'Authorization': `Bearer ${_bearerToken}`,
                 'Accept': '*/*'
             }
         }
         return await this.getRequest(_url, options);
     }
 
-    async getViolations(_url: string, _bearerResponse: IBlackDuckToken): Promise<IBlackDuckViolations> {
+    async getViolations(_url: string, _bearerToken: string): Promise<IBlackDuckViolations> {
         console.log("Get Violations...");
         let options: IRequestOptions = {
             port: 443,
             headers: {
-                'Authorization': `Bearer ${_bearerResponse.bearerToken}`,
+                'Authorization': `Bearer ${_bearerToken}`,
                 'Accept': 'application/vnd.blackducksoftware.bill-of-materials-6+json'
             }
         }
@@ -169,10 +182,90 @@ class BlackDuckCheck {
         req.on('error', (error) => {
             reject(error);
         });
-        req.end();
-    });
-}
+            req.end();
+        });
+    }
 
-}
+    async failOnSecurityRisks(bdData: IBlackDuckVersion): Promise<IRiskState> {
+        console.log("Checking for security risks...");
+        try {
+            let versionSecurityRisk = bdData.items[0].securityRiskProfile.counts;
+            let severityCheck: boolean = await this.checkViolations(versionSecurityRisk);
+            let message: string;
+            if (severityCheck)
+            {
+                message = "A critical or high secuirty vulnerability detected"
+            }
+            else
+            {
+                message = "No critical or high security errors detected"
+            }
+            console.log(message);
+            return {
+                risk: severityCheck,
+                message: message
+            }
+        } 
+        catch (error) {
+            console.log(error);
+            reject(error)
+        }
+    }
 
-export const blackduckCheck = new BlackDuckCheck();
+    async failOnLicenseRisks(bdData: IBlackDuckVersion): Promise<IRiskState> {
+        console.log("Checking for license risks...")
+        try {
+            let versionLicenseRisk = bdData.items[0].licenseRiskProfile.counts;
+            let licenseCheck: boolean = await this.checkViolations(versionLicenseRisk);
+            let message: string;
+            if (licenseCheck) {
+                message = "A critical or high license risk detected"
+            }
+            else {
+                message = "No critical or high license risk detected"
+            }
+            console.log(message);
+            return {
+                risk: licenseCheck,
+                message: message
+            }
+            
+        } catch (error) {
+            reject(error);
+        }
+    }
+    
+    async failOnPolicyViolations(versionDetails: IBlackDuckVersion): Promise<IRiskState> {
+        try
+        {
+            let policyVersionRisk = versionDetails.items[0].policyStatusSummaries;
+            let poilicyCheck: boolean = await this.checkPolicy(policyVersionRisk);
+            let message: string;
+            if (poilicyCheck) {
+                message = "A policy violation is detected";
+            }
+            else {
+                message = "No policy violsations were detected";
+            }
+            console.log(message);
+            return {
+                risk: poilicyCheck,
+                message: message
+            }
+
+        }
+        catch (error)
+        {
+            console.log(error)
+        }
+    }
+
+    async run(): Promise<IBlackDuckVersion> {
+        let bearerToken = await this.authenticate(this.baseUrl, this.bdToken);
+        let projectUrl = `https://${this.baseUrl}/api/projects?q=name:${this.bdProjectName}`;
+        const projectDetails = await this.getProjects(projectUrl, bearerToken);
+        const versionUrl = `${projectDetails.items[0]._meta.href}/versions?q=versionName:${this.bdVersionName}`;
+        let versionDetails: IBlackDuckVersion = await this.getVersions(versionUrl, bearerToken);
+        return versionDetails
+    }
+}
