@@ -1,52 +1,6 @@
-import { IBlackDuckVersion } from "../../src/models/IBlackDuckVersion";
-import { IBlackDuckViolations } from "../../src/models/IBlackDuckViolations";
-import { IBlackDuckProject } from "../../src/models/IBlackDuckProject";
-import { ProjectItem, Link } from "../../src/models/ISharedItems";
-
-export const mockProjectResponse:IBlackDuckProject = {
+{
     "totalCount": 1,
-    "items": [{
-    "name": "ProjectName",
-    "projectLevelAdjustments": true,
-        "cloneCategories": ["COMPONENT_DATA",
-            "VULN_DATA"],
-    "customSignatureEnabled": false,
-    "customSignatureDepth": 5,
-    "deepLicenseDataEnabled": false,
-    "snippetAdjustmentApplied": false,
-    "licenseConflictsEnabled": false,
-    "createdAt": "2021-07-13T17:00:00.000Z",
-    "createdBy": "jbeck@allegion.com",
-    "createdByUser": "https://localhost/api/users/USERGUID123",
-    "updatedAt": "2021-07-13T17:00:00.000Z",
-    "updatedBy": "jbeck@allegion.com",
-    "updatedByUser": "https://localhost/api/users/USERGUID123",
-    "source": "CUSTOM",
-    "_meta": {
-        "allow": ["GET"],
-        "href": "https://localhost/api/projects/PROJECTGUID123",
-        "links": [ {
-            "rel": "versions",
-            "href": "https://localhost/api/projects/PROJECTGUID123/versions/VERSIONGUID123"
-            }]
-        }
-    }],
-    "appliedFilters": [],
-    "_meta": {
-        "allow": ['GET'],
-        "href": "https://localhost:5000",
-        "links": [{
-            "rel": "versions",
-            "href": "https://localhost/api/projects/PROJECTGUID123/versions/VERSIONGUID123",
-            "name": "subscribed",
-            "label": "Subscribed"
-        }]
-    }
-}
-
-export const mockVersionResponse:IBlackDuckVersion = {
-    "totalCount": 1,
-        "items": [
+    "items": [
         {
             "createdAt": "2021-07-13T17:00:00.000Z",
             "createdBy": "jbeck@allegion.com",
@@ -263,50 +217,50 @@ export const mockVersionResponse:IBlackDuckVersion = {
             "lastScanDate": "2021-10-25T13:10:29.115Z"
         }
     ],
-        "appliedFilters": [],
-            "_meta": {
-    "allow": [
-        "POST",
-        "GET"
-    ],
+    "appliedFilters": [],
+    "_meta": {
+        "allow": [
+            "POST",
+            "GET"
+        ],
         "href": "https://localhost/api/projects/PROJECTGUID123/versions",
-            "links": [
-                {
-                    "rel": "static-filter",
-                    "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=distribution",
-                    "name": "distribution",
-                    "label": "Distribution"
-                },
-                {
-                    "rel": "dynamic-filter",
-                    "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=license",
-                    "name": "license",
-                    "label": "License"
-                },
-                {
-                    "rel": "static-filter",
-                    "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=licenseRisk",
-                    "name": "licenseRisk",
-                    "label": "License Risk"
-                },
-                {
-                    "rel": "static-filter",
-                    "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=operationalRisk",
-                    "name": "operationalRisk",
-                    "label": "Operational Risk"
-                },
-                {
-                    "rel": "static-filter",
-                    "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=phase",
-                    "name": "phase",
-                    "label": "Release Phase"
-                },
-                {
-                    "rel": "static-filter",
-                    "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=securityRisk",
-                    "name": "securityRisk",
-                    "label": "Security Risk"
-                }
-            ]
+        "links": [
+            {
+                "rel": "static-filter",
+                "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=distribution",
+                "name": "distribution",
+                "label": "Distribution"
+            },
+            {
+                "rel": "dynamic-filter",
+                "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=license",
+                "name": "license",
+                "label": "License"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=licenseRisk",
+                "name": "licenseRisk",
+                "label": "License Risk"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=operationalRisk",
+                "name": "operationalRisk",
+                "label": "Operational Risk"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=phase",
+                "name": "phase",
+                "label": "Release Phase"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://localhost/api/projects/PROJECTGUID123/versions-filters?filterKey=securityRisk",
+                "name": "securityRisk",
+                "label": "Security Risk"
+            }
+        ]
     }
 }

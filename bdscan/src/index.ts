@@ -1,9 +1,11 @@
 import * as task from 'azure-pipelines-task-lib/task';
+import { DetectADOConstants } from './lib/BlackDuckConstants';
 import {IBlackDuckConfig} from './models/IBlackDuckConfig';
 import { IBlackDuckToken } from './models/IBlackDuckToken';
 import { IBlackDuckProject } from './models/IBlackDuckProject';
+import { IRiskState } from './models/IRiskState';
 import { IBlackDuckVersion } from './models/IBlackDuckVersion';
-import { blackduckCheck } from './services/BlackDuckCheck';
+import { BlackDuckCheck } from './services/BlackDuckCheck';
 
 async function run() {
     try {
@@ -11,31 +13,45 @@ async function run() {
         const bdProjectName = task.getInput('projectName', true);
         const bdVersionName = task.getInput('versionName', true);
         const baseUrl = "allegion.blackducksoftware.com"
-        if (bdService == undefined){
+        if (bdService === undefined){
             task.setResult(task.TaskResult.Failed, 'Need Black Duck connection string');
             return
         }
-        let bdCreds: IBlackDuckConfig = await blackduckCheck.getBlackDuckCredentials(bdService);
-        let bearerResponse: IBlackDuckToken = await blackduckCheck.authenticate(baseUrl, bdCreds);
-        let projectUrl = `https://${baseUrl}/api/projects?q=name:${bdProjectName}`;
-        let projectDetails: IBlackDuckProject = await blackduckCheck.getProjects(projectUrl, bearerResponse);
-        let versionUrl = `${projectDetails.items[0]._meta.href}/versions?q=versionName:${bdVersionName}`;
-        let versionDetails: IBlackDuckVersion = await blackduckCheck.getVersions(versionUrl, bearerResponse);
-        let versionSecurityRisk = versionDetails.items[0].securityRiskProfile.counts;
-        let severityCheck: boolean = await blackduckCheck.checkVersionSecurityRisks(versionSecurityRisk);
-        if (severityCheck){
+        /* Get Black Duck Token */
+        let bdCreds: IBlackDuckConfig = await getBlackDuckCredentials(bdService);
+        task.setSecret(bdCreds.blackduckApiToken);
+        
+        /* Run BlackDuck API Calls */
+        let blackduckCheck = new BlackDuckCheck(bdCreds.blackduckApiToken, bdProjectName, bdVersionName, baseUrl);
+        let blackDuckData:IBlackDuckVersion = await blackduckCheck.run();
+        
+        /* Check licenses */
+        const failOnLicenseSelection = task.getBoolInput('failOnLicenseRisks', false);
+        if (failOnLicenseSelection){
+            const licenseCheck = await blackduckCheck.failOnLicenseRisks(blackDuckData);
+            if (licenseCheck.risk){
+                task.setResult(task.TaskResult.Failed, licenseCheck.message, true);
+            }
+        }
 
-            /** TODO: Add ability to filter out data **/
-            
-            // let bomUrl = `${versionDetails.items[0]._meta.href}/vulnerable-bom-components`;
-            // let violationDetails: IBlackDuckViolations = await getViolations(bomUrl, bearerResponse);
-            console.log("A critical or high vulnerability detected");
-            task.setResult(task.TaskResult.Failed, "A critical or high vulnerability detected", true);
+        /* Security check*/
+        const failOnSecuritySelection = task.getBoolInput('failOnSecurityRisks', false)
+        if (failOnSecuritySelection){
+            let securityCheck:IRiskState = await blackduckCheck.failOnSecurityRisks(blackDuckData);
+            if (securityCheck.risk){
+                task.setResult(task.TaskResult.Failed, securityCheck.message, true);
+            }
         }
-        else {
-            console.log("No critical or high security errors detected");
-            task.setResult(task.TaskResult.Succeeded, "No critical or high security errors detected", true);
+
+        /* Policy check */
+        const failOnPolicySelection = task.getBoolInput('failOnPolicyViolations', false);
+        if (failOnPolicySelection){
+            let policyCheck:IRiskState = await blackduckCheck.failOnPolicyViolations(blackDuckData);
+            if (policyCheck.risk) {
+                task.setResult(task.TaskResult.Failed, policyCheck.message);
+            }
         }
+        task.setResult(task.TaskResult.Succeeded, "Black Duck scan complete. No checks failed.")
     }
     catch (err) {
         task.setResult(task.TaskResult.Failed, err.message);
@@ -43,3 +59,16 @@ async function run() {
 }
 
 run();
+
+async function getBlackDuckCredentials(bdService): Promise < IBlackDuckConfig > {
+    const bdUrl: string = task.getEndpointUrl(bdService, false);
+    const bdToken: string = task.getEndpointAuthorizationParameter(bdService, DetectADOConstants.BLACKDUCK_API_TOKEN, false);
+
+    return {
+        blackduckUrl: bdUrl,
+        blackduckApiToken: bdToken
+    }
+}
+
+
+
