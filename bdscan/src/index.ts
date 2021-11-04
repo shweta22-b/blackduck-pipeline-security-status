@@ -6,6 +6,7 @@ import { IBlackDuckProject } from './models/IBlackDuckProject';
 import { IRiskState } from './models/IRiskState';
 import { IBlackDuckVersion } from './models/IBlackDuckVersion';
 import { BlackDuckCheck } from './services/BlackDuckCheck';
+import { BlackDuckAPICalls } from './services/BlackDuckAPICalls'
 
 async function run() {
     try {
@@ -23,7 +24,7 @@ async function run() {
         
         /* Run BlackDuck API Calls */
         let blackduckCheck = new BlackDuckCheck(bdCreds.blackduckApiToken, bdProjectName, bdVersionName, baseUrl);
-        let blackDuckData:IBlackDuckVersion = await blackduckCheck.run();
+        let blackDuckData: IBlackDuckVersion = await blackduckCheck.callBlackDuckAPI();
         
         /* Check licenses */
         const failOnLicenseSelection = task.getBoolInput('failOnLicenseRisks', false);
@@ -35,12 +36,19 @@ async function run() {
         }
 
         /* Security check*/
-        const failOnSecuritySelection = task.getBoolInput('failOnSecurityRisks', false)
+        const failOnSecuritySelection = task.getBoolInput('failOnSecurityRisks', false);
+        const securityExclusionList = task.getInput('securityExclusions', false);
+        let exclusionList = securityExclusionList.length > 0 ? securityExclusionList.split(', ') : [];
         if (failOnSecuritySelection){
-            let securityCheck:IRiskState = await blackduckCheck.failOnSecurityRisks(blackDuckData);
-            if (securityCheck.risk){
-                task.setResult(task.TaskResult.Failed, securityCheck.message, true);
-            }
+            let securityCheck: IRiskState[] = await blackduckCheck.failOnSecurityRisks(blackDuckData, exclusionList);
+            securityCheck.forEach((riskAssessment) => {
+                if (riskAssessment.risk){
+                    task.setResult(task.TaskResult.Failed, riskAssessment.message);
+                }
+                else{
+                    task.setResult(task.TaskResult.Succeeded, riskAssessment.message)
+                }
+            });
         }
 
         /* Policy check */
