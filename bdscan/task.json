@@ -55,6 +55,14 @@
             "helpMarkDown": "Fail task on CRITICAL or HIGH security risks. Defaults to true."
         },
         {
+            "name": "securityExclusions",
+            "type": "string",
+            "label": "List of security component names to exclude from checks",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "List of security component names to exclude from task checking delineated by comma space (, )."
+        },
+        {
             "name": "failOnLicenseRisks",
             "type": "boolean",
             "label": "Fail on license risks",

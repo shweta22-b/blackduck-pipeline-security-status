@@ -2,76 +2,14 @@ import { IBlackDuckToken } from '../models/IBlackDuckToken';
 import { IBlackDuckProject } from '../models/IBlackDuckProject';
 import { IBlackDuckVersion } from '../models/IBlackDuckVersion';
 import { IBlackDuckViolations } from '../models/IBlackDuckViolations';
-import { IRequestOptions } from '../models/IRequestOptions';
 import { IRiskState } from '../models/IRiskState';
-import { Count, PolicyStatusSummaries } from '../models/ISharedItems';
-import * as https from 'https';
-import { reject } from 'q';
-import { resolve } from 'path/posix';
+import { Count, PolicyStatusSummaries, ViolationsItem } from '../models/ISharedItems';
+import { BlackDuckAPICalls } from './BlackDuckAPICalls';
 
-export class BlackDuckCheck {
-    private bdToken: string;
-    public bdProjectName: string;
-    public bdVersionName: string;
-    public baseUrl: string;
+export class BlackDuckCheck extends BlackDuckAPICalls {
     
-    constructor(_bdToken:string, _bdProjectName:string, _bdVersionName:string, _baseUrl:string){
-        this.bdToken = _bdToken;
-        this.bdProjectName = _bdProjectName;
-        this.bdVersionName = _bdVersionName;
-        this.baseUrl = _baseUrl;
-    }
-
-    private async authenticate(_baseUrl, _bdToken: string): Promise<string> {
-    console.log("Authenticating...");
-    let options: IRequestOptions = {
-        hostname: _baseUrl,
-        port: 443,
-        path: '/api/tokens/authenticate',
-        method: 'POST',
-        headers: {
-            'Authorization': `token ${this.bdToken}`,
-            'Accept': 'application/vnd.blackducksoftware.user-4+json'
-        }
-    }
-        let bearerResponse: IBlackDuckToken = await this.request(options);
-        return bearerResponse.bearerToken;
-    }
-
-        async getProjects(_url: string, _bearerToken: string): Promise<IBlackDuckProject> {
-        console.log("Get Projects...");
-        let options: IRequestOptions = {
-            port: 443,
-            headers: {
-                'Authorization': `Bearer ${_bearerToken}`,
-                'Accept': 'application/vnd.blackducksoftware.project-detail-4+json'
-            }
-        }
-        return await this.getRequest(_url, options);
-    }
-
-    async getVersions(_url: string, _bearerToken: string): Promise<IBlackDuckVersion> {
-        console.log("Get Versions...");
-        let options: IRequestOptions = {
-            port: 443,
-            headers: {
-                'Authorization': `Bearer ${_bearerToken}`,
-                'Accept': '*/*'
-            }
-        }
-        return await this.getRequest(_url, options);
-    }
-
-    async getViolations(_url: string, _bearerToken: string): Promise<IBlackDuckViolations> {
-        console.log("Get Violations...");
-        let options: IRequestOptions = {
-            port: 443,
-            headers: {
-                'Authorization': `Bearer ${_bearerToken}`,
-                'Accept': 'application/vnd.blackducksoftware.bill-of-materials-6+json'
-            }
-        }
-        return await this.getRequest(_url, options);
+    constructor(_bdToken: string, _bdProjectName: string, _bdVersionName: string, _baseUrl: string) {
+        super(_bdToken, _bdProjectName, _bdVersionName, _baseUrl);
     }
 
     async checkViolations(violationProfiles: Count[] | undefined): Promise<boolean> {
@@ -122,107 +60,55 @@ export class BlackDuckCheck {
         }
     }
 
-    async request(options: IRequestOptions): Promise<any> {
-        return new Promise((resolve, reject) => {
-            const req = https.request(options, (res) => {
-                if (res.statusCode > 200 && res.statusCode < 300)
-                {
-                    return reject(new Error(`status code ${res.statusCode}`));
-                }
-                let body = [];
-                let response;
-                res.on('data', (data) => {
-                    body.push(data);
-                });
-                res.on('end', () => {
-                    try
-                    {
-                        response = JSON.parse(Buffer.concat(body).toString());
-                    }
-                    catch (error)
-                    {
-                        reject(error);
-                    }
-                    resolve(response);
-                })
-            });
-
-            req.on('error', (error) => {
-                reject(error);
-            });
-            req.end();
-        });
-    }
-
-    async getRequest(url: string, options: IRequestOptions): Promise<any> {
-    return new Promise((resolve, reject) => {
-        const req = https.get(url, options, (res) => {
-            if (res.statusCode > 200 && res.statusCode < 300)
-            {
-                return reject(new Error(`status code ${res.statusCode}`));
-            }
-            let body = [];
-            let response;
-            res.on('data', (data) => {
-                body.push(data);
-            });
-            res.on('end', () => {
-                try
-                {
-                    response = JSON.parse(Buffer.concat(body).toString());
-                }
-                catch (error)
-                {
-                    reject(error);
-                }
-                resolve(response);
-            })
-        });
-
-        req.on('error', (error) => {
-            reject(error);
-        });
-            req.end();
-        });
-    }
-
-    async failOnSecurityRisks(bdData: IBlackDuckVersion): Promise<IRiskState> {
+    async failOnSecurityRisks(bdData: IBlackDuckVersion, exclusionList:string[] ): Promise<IRiskState[]> {
         console.log("Checking for security risks...");
         try {
             let versionSecurityRisk = bdData.items[0].securityRiskProfile.counts;
             let severityCheck: boolean = await this.checkViolations(versionSecurityRisk);
             let message: string;
-            if (severityCheck)
+            let result: IRiskState[] = [];
+            if (severityCheck && exclusionList.length > 0)
             {
-                message = "A critical or high secuirty vulnerability detected"
+                const violationUrl = `${bdData.items[0]._meta.href}/vulnerable-bom-components`;
+                const securityRisks:IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
+                result = await this.checkExclusions(exclusionList, securityRisks.items)
+            }
+            else if (severityCheck) {
+                message = "Critical or high security risks detected"
+                const riskAssessment = {
+                    risk: severityCheck,
+                    message: message
+                }
+                result.push(riskAssessment);
             }
             else
             {
-                message = "No critical or high security errors detected"
+                message = "No critical or high security risks detected"
+                const riskAssessment = {
+                    risk: severityCheck,
+                    message: message
+                }
+                result.push(riskAssessment);
             }
-            console.log(message);
-            return {
-                risk: severityCheck,
-                message: message
-            }
+            result.forEach((msg) => console.log(msg));
+            return result
         } 
         catch (error) {
             console.log(error);
-            reject(error)
         }
     }
 
     async failOnLicenseRisks(bdData: IBlackDuckVersion): Promise<IRiskState> {
-        console.log("Checking for license risks...")
+        console.log("Checking for license risks...");
         try {
             let versionLicenseRisk = bdData.items[0].licenseRiskProfile.counts;
             let licenseCheck: boolean = await this.checkViolations(versionLicenseRisk);
             let message: string;
             if (licenseCheck) {
-                message = "A critical or high license risk detected"
+                message = "A critical or high license risk was detected"
             }
             else {
-                message = "No critical or high license risk detected"
+                message = "No critical or high license risks were detected"
             }
             console.log(message);
             return {
@@ -231,21 +117,22 @@ export class BlackDuckCheck {
             }
             
         } catch (error) {
-            reject(error);
+            console.log(error);
         }
     }
     
     async failOnPolicyViolations(versionDetails: IBlackDuckVersion): Promise<IRiskState> {
+        console.log("Checking for policy violations...");
         try
         {
             let policyVersionRisk = versionDetails.items[0].policyStatusSummaries;
             let poilicyCheck: boolean = await this.checkPolicy(policyVersionRisk);
             let message: string;
             if (poilicyCheck) {
-                message = "A policy violation is detected";
+                message = "A policy violation was detected";
             }
             else {
-                message = "No policy violsations were detected";
+                message = "No policy violations were detected";
             }
             console.log(message);
             return {
@@ -256,16 +143,36 @@ export class BlackDuckCheck {
         }
         catch (error)
         {
-            console.log(error)
+            console.log(error);
         }
     }
 
-    async run(): Promise<IBlackDuckVersion> {
-        let bearerToken = await this.authenticate(this.baseUrl, this.bdToken);
-        let projectUrl = `https://${this.baseUrl}/api/projects?q=name:${this.bdProjectName}`;
-        const projectDetails = await this.getProjects(projectUrl, bearerToken);
-        const versionUrl = `${projectDetails.items[0]._meta.href}/versions?q=versionName:${this.bdVersionName}`;
-        let versionDetails: IBlackDuckVersion = await this.getVersions(versionUrl, bearerToken);
-        return versionDetails
+    async checkExclusions(exclusionList: string[], risks: ViolationsItem[]): Promise<IRiskState[]> {
+        let message: string;
+        let result: IRiskState[] = [];
+        for (const exclusion of exclusionList)
+        {
+            risks.forEach((comp: ViolationsItem) => {
+                let riskAssessment: IRiskState;
+                if (comp.componentName == exclusion)
+                {
+                    message = `EXCLUDED: ${comp.componentName} from critical or high     security risk.`;
+                    console.log(message);
+                    riskAssessment = {
+                        risk: false,
+                        message: message
+                    }
+                    result.push(riskAssessment);
+                }
+                else
+                {
+                    message = `${comp.componentName} is a critical or high security risk.`
+                    console.log(message);
+                    result.push(riskAssessment);
+                }
+            })
+        }
+        return result;
     }
+
 }
