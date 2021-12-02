@@ -2,6 +2,7 @@ import { IBlackDuckToken } from '../src/models/IBlackDuckToken';
 import versionData from './__mocks__/mockVersionData.json';
 import projectData from './__mocks__/mockProjectData.json';
 import vulnerabilityData from './__mocks__/mockVulnerabilityData.json';
+import policyData from './__mocks__/mockPolicyViolationsData.json'
 import { IRequestOptions } from '../src/models/IRequestOptions';
 import { BlackDuckCheck } from '../src/services/BlackDuckCheck';
 import { IBlackDuckProject } from '../src/models/IBlackDuckProject';
@@ -29,17 +30,6 @@ let mockOption: IRequestOptions = {
         'Accept': 'bd-json-data'
     }
 }
-/* TODO Mock the Task Functions */
-// const serviceConnectionId = {Endpoint: 'mockendpoint.mockurl'};
-
-// process.env.ENDPOINT_AUTH_SYSTEMVVSSCONNECTION="serviceConnectionId";
-// process.env.ENDPOINT_AUTH_SCHEME_SYSTEMVSSCONNECTION ="serviceConnectionId";
-// process.env.ENDPOINT_AUTH_PARAMETER_SYSTEMVSSCONNECTION_ACCESSTOKEN="fakeaccesstoken";
-
-// taskrunner.setInput("blackduckconnection", 'serviceConnectionId');
-// taskrunner.setInput("projectName", "Test-Project");
-// taskrunner.setInput("versionName", "Test-Version");
-// taskrunner.run();
 
 describe('Black Duck Checks', () => {
     let blackduckCheck = new BlackDuckCheck(mockBlackDuckAPIToken, "Test-Project", "Test-Version", "mockurl.mockurl");
@@ -67,13 +57,13 @@ describe('Black Duck Checks', () => {
         expect(mockSecRisks[0].risk).toEqual(false);
     });
 
-    test('Should return a length of 0 with no security exclusions', async () => {
+    test('Should return a length of 2 with no security exclusions', async () => {
         const vulDataString = JSON.stringify(vulnerabilityData)
         const vulData: IBlackDuckViolations = JSON.parse(vulDataString);
         const mockInputExclusionString = "";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
         const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items);
-        expect(mockSecRisks.length).toEqual(0);
+        expect(mockSecRisks.length).toEqual(2);
     });
 
     test('Should return true with no security exclusions', async () => {
@@ -82,7 +72,38 @@ describe('Black Duck Checks', () => {
         const mockInputExclusionString = "";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
         const mockSecRisks: IRiskState[] = await blackduckCheck.failOnSecurityRisks(verData, mockExclusionArray);
-        expect(mockSecRisks[0].risk).toEqual(true);
-    })
+        expect(mockSecRisks.some(comp => comp.risk === true)).toEqual(true);
+    });
+
+    test('Should return a length of 2 with no policy exclusions', async () => {
+        const polDataString = JSON.stringify(policyData);
+        const polData: IBlackDuckViolations = JSON.parse(polDataString);
+        const mockInputExclusionString = "";
+        const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
+        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items);
+        expect(mockPolRisks.length).toEqual(2);
+    });
+
+    test('Should return a length of two with one policy exclusions', async () => {
+        const polDataString = JSON.stringify(policyData);
+        const polData: IBlackDuckViolations = JSON.parse(polDataString);
+        const mockInputExclusionString = "Microsoft.Azure.DurableTask.AzureStorage";
+        const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
+        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items);
+        expect(mockPolRisks.length).toEqual(2);
+    });
+
+    test('Should return false with two security exclusions', async () => {
+        const polDataString = JSON.stringify(policyData);
+        const polData: IBlackDuckViolations = JSON.parse(polDataString);
+        const mockInputExclusionString = "Microsoft.Azure.DurableTask.AzureStorage, HIC.RDMP.Plugin";
+        const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
+        console.log(mockExclusionArray);
+        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items);
+        console.log(`mock data: ${mockPolRisks[0].risk} ${mockPolRisks[1].risk}`);
+        expect(mockPolRisks.some(comp => comp.risk === true)).toEqual(false);
+    });
+
+
 })
 

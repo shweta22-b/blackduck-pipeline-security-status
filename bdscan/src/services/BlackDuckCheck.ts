@@ -46,7 +46,6 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         policyProfile.forEach(item => {
             if (item.status.toUpperCase() == 'IN_VIOLATION')
             {
-
                 value = true;
             }
         });
@@ -90,7 +89,10 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
                 }
                 result.push(riskAssessment);
             }
-            result.forEach((msg) => console.log(msg));
+            result.forEach((msg) => {
+                msg.risk
+                console.log(msg)
+            });
             return result
         } 
         catch (error) {
@@ -121,24 +123,39 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
     
-    async failOnPolicyViolations(versionDetails: IBlackDuckVersion): Promise<IRiskState> {
+    async failOnPolicyViolations(versionDetails: IBlackDuckVersion, exclusionList: string[]): Promise<IRiskState[]> {
         console.log("Checking for policy violations...");
         try
         {
             let policyVersionRisk = versionDetails.items[0].policyStatusSummaries;
             let poilicyCheck: boolean = await this.checkPolicy(policyVersionRisk);
             let message: string;
-            if (poilicyCheck) {
+            let result: IRiskState[] = [];
+            if (poilicyCheck && exclusionList.length > 0) {
+                const policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
+                const policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
+                result = await this.checkExclusions(exclusionList, policyRisks.items)
+            }
+            else if (poilicyCheck) {
                 message = "A policy violation was detected";
+                const riskAssessment = {
+                    risk: poilicyCheck,
+                    message: message
+                }
+                console.log(message);
+                result.push(riskAssessment);
             }
             else {
                 message = "No policy violations were detected";
+                const riskAssessment = {
+                    risk: poilicyCheck,
+                    message: message
+                }
+                console.log(message);
+                result.push(riskAssessment);
             }
-            console.log(message);
-            return {
-                risk: poilicyCheck,
-                message: message
-            }
+            
+            return result
 
         }
         catch (error)
@@ -150,29 +167,30 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
     async checkExclusions(exclusionList: string[], risks: ViolationsItem[]): Promise<IRiskState[]> {
         let message: string;
         let result: IRiskState[] = [];
-        for (const exclusion of exclusionList)
+        for (const component of risks)
         {
-            risks.forEach((comp: ViolationsItem) => {
-                let riskAssessment: IRiskState;
-                if (comp.componentName == exclusion)
-                {
-                    message = `EXCLUDED: ${comp.componentName} from critical or high     security risk.`;
-                    console.log(message);
-                    riskAssessment = {
-                        risk: false,
-                        message: message
-                    }
-                    result.push(riskAssessment);
+            let riskAssessment: IRiskState;
+            if (exclusionList.includes(component.componentName))
+            {
+                message = `EXCLUDED: ${component.componentName} from risk assessment.`;
+                console.log(message);
+                riskAssessment = {
+                    risk: false,
+                    message: message
                 }
-                else
-                {
-                    message = `${comp.componentName} is a critical or high security risk.`
-                    console.log(message);
-                    result.push(riskAssessment);
+                result.push(riskAssessment);
+            }
+            else
+            {
+                message = `${component.componentName} is a risk.`
+                console.log(message);
+                riskAssessment = {
+                    risk: true,
+                    message: message
                 }
-            })
+                result.push(riskAssessment);
+            }
         }
         return result;
     }
-
 }

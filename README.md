@@ -6,12 +6,18 @@ Uses the service connection established for Black Duck task to perform additiona
 
 ``` 
 steps:
-- task: ProductTech.alle-bd-sec-scan.alle-bd-sec-scan-task.alle-bd-sec-scan@0
+- task: ProductTech.alle-bd-sec-scan.alle-bd-sec-scan-task.alle-bd-sec-scan@1
   displayName: 'Black Duck Vulnerability Result'
   inputs:
     blackduckconnection: '{ NAME OF BLACK DUCK SERVICE CONNECTION }'
     projectName: ' { NAME OF BLACK DUCK PROJECT NAME (i.e. IT-Allegion-NA-SW-FO-) }'
-    versionName: ' { NAME OF BUILD VERSION NAME (i.e. master-CIBuild }'
+    versionName: '{ NAME OF BUILD VERSION NAME (i.e. master-CIBuild }'
+    failOnSecurityRisks: { BOOLEAN }
+    securityExclusions: '{COMPONENTS THAT WILL NOT FAIL BUILD SEPARATED BY COMMA SPACE ", "}'
+    failOnLicenseRisks: { BOOLEAN }
+    licenseExclusions: '{COMPONENTS THAT WILL NOT FAIL BUILD SEPARATED BY COMMA SPACE ", "}'
+    failOnPolicyViolations: {BOOLEAN}
+    policyExclusions: '{COMPONENTS THAT WILL NOT FAIL BUILD SEPARATED BY COMMA SPACE ", "}'
 ```
 
 <br>   
@@ -34,6 +40,6 @@ steps:
 <br>
 
 <b>TODO</b>   
-- Add a means to exclude certain security violations triggering a failure, even if they are CRITICAL or HIGH  
 - Incorporate with Omkar's pipeline reports
+- Add license exclusions
 - Enhanced configurability of what triggers actions within ADO
