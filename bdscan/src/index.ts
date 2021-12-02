@@ -54,7 +54,7 @@ async function run() {
         /* Policy check */
         const failOnPolicySelection = task.getBoolInput('failOnPolicyViolations', false);
         const policyExclusionList = task.getInput('policyExclusions', false);
-        let policyList = policyExclusionList.length === undefined ? [] : policyExclusionList.split(', ');
+        let policyList = policyExclusionList === undefined ? [] : policyExclusionList.split(', ');
         if (failOnPolicySelection){
             let policyCheck:IRiskState[] = await blackduckCheck.failOnPolicyViolations(blackDuckData, policyList);
             policyCheck.forEach((riskAssessment) => {
