@@ -38,9 +38,9 @@ async function run() {
         /* Security check*/
         const failOnSecuritySelection = task.getBoolInput('failOnSecurityRisks', false);
         const securityExclusionList = task.getInput('securityExclusions', false);
-        let exclusionList = securityExclusionList.length > 0 ? securityExclusionList.split(', ') : [];
+        let securityList = securityExclusionList === undefined ? [] : securityExclusionList.split(', ');
         if (failOnSecuritySelection){
-            let securityCheck: IRiskState[] = await blackduckCheck.failOnSecurityRisks(blackDuckData, exclusionList);
+            let securityCheck: IRiskState[] = await blackduckCheck.failOnSecurityRisks(blackDuckData, securityList);
             securityCheck.forEach((riskAssessment) => {
                 if (riskAssessment.risk){
                     task.setResult(task.TaskResult.Failed, riskAssessment.message);
@@ -53,11 +53,20 @@ async function run() {
 
         /* Policy check */
         const failOnPolicySelection = task.getBoolInput('failOnPolicyViolations', false);
+        const policyExclusionList = task.getInput('policyExclusions', false);
+        let policyList = policyExclusionList === undefined ? [] : policyExclusionList.split(', ');
         if (failOnPolicySelection){
-            let policyCheck:IRiskState = await blackduckCheck.failOnPolicyViolations(blackDuckData);
-            if (policyCheck.risk) {
-                task.setResult(task.TaskResult.Failed, policyCheck.message);
-            }
+            let policyCheck:IRiskState[] = await blackduckCheck.failOnPolicyViolations(blackDuckData, policyList);
+            policyCheck.forEach((riskAssessment) => {
+                if (riskAssessment.risk)
+                {
+                    task.setResult(task.TaskResult.Failed, riskAssessment.message);
+                }
+                else
+                {
+                    task.setResult(task.TaskResult.Succeeded, riskAssessment.message)
+                }
+            })
         }
         task.setResult(task.TaskResult.Succeeded, "Black Duck scan complete. No checks failed.")
     }
@@ -77,6 +86,3 @@ async function getBlackDuckCredentials(bdService): Promise < IBlackDuckConfig > 
         blackduckApiToken: bdToken
     }
 }
-
-
-
