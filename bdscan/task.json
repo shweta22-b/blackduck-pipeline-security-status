@@ -1,95 +1,95 @@
 {
-    "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-    "id": "cba99a4e-1c8f-432d-8b28-280caaea27c9",
-    "name": "alle-bd-sec-scan",
-    "friendlyName": "Alle BlackDuck Security Scan",
-    "description": "Simple scan to bring scan information into the build pipeline.",
-    "helpMarkDown": "",
-    "category": "Utility",
-    "author": "ProductTech",
-    "version": {
-        "Major": 1,
-        "Minor": 0,
-        "Patch": 0
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "cba99a4e-1c8f-432d-8b28-280caaea27c9",
+  "name": "alle-bd-sec-scan",
+  "friendlyName": "Alle BlackDuck Security Scan",
+  "description": "Simple scan to bring scan information into the build pipeline.",
+  "helpMarkDown": "",
+  "category": "Utility",
+  "author": "ProductTech",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 1
+  },
+  "instanceNameFormat": "Black Duck Vulnerability Result",
+  "inputs": [
+    {
+      "name": "blackduckconnection",
+      "type": "connectedService:SynopsysBlackDuck",
+      "label": "Service connection name for Black Duck",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "connection string name"
     },
-    "instanceNameFormat": "Black Duck Vulnerability Result",
-    "inputs": [
-        {
-            "name": "blackduckconnection",
-            "type": "connectedService:SynopsysBlackDuck",
-            "label": "Service connection name for Black Duck",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "connection string name"
-        },
-        {
-            "name": "projectName",
-            "type": "string",
-            "label": "Black Duck Project Name",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "Name of Black Duck project"
-        },
-        {
-            "name": "versionName",
-            "type": "string",
-            "label": "Black Duck Version Name",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "Name of Black Duck version"
-        },
-        {
-            "name": "failOnSecurityRisks",
-            "type": "boolean",
-            "label": "Fail on security risks",
-            "defaultValue": "false",
-            "required": false,
-            "helpMarkDown": "Fail task on CRITICAL or HIGH security risks. Defaults to true."
-        },
-        {
-            "name": "securityExclusions",
-            "type": "string",
-            "label": "List of security component names to exclude from checks",
-            "defaultValue": "",
-            "required": false,
-            "helpMarkDown": "List of security component names to exclude from task checking delineated by comma space (, )."
-        },
-        {
-            "name": "failOnLicenseRisks",
-            "type": "boolean",
-            "label": "Fail on license risks",
-            "defaultValue": "false",
-            "required": false,
-            "helpMarkDown": "Fail task on HIGH license risks."
-        },
-        {
-            "name": "licenseExclusions",
-            "type": "string",
-            "label": "List of licenses to exclude from checks",
-            "defaultValue": "",
-            "required": false,
-            "helpMarkDown": "List of licenses to exclude from task checking delineated by comma space (, )."
-        },
-        {
-            "name": "failOnPolicyViolations",
-            "type": "boolean",
-            "label": "Fail on policy violations",
-            "defaultValue": "false",
-            "required": false,
-            "helpMarkDown": "Fail task on policy violations."
-        },
-        {
-            "name": "policyExclusions",
-            "type": "string",
-            "label": "List of policy names to exclude from checks",
-            "defaultValue": "",
-            "required": false,
-            "helpMarkDown": "List of policy names to exclude from task checking delineated by comma space (, )."
-        }
-    ],
-    "execution": {
-        "Node10": {
-            "target": "./dist/index.js"
-        }
+    {
+      "name": "projectName",
+      "type": "string",
+      "label": "Black Duck Project Name",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Name of Black Duck project"
+    },
+    {
+      "name": "versionName",
+      "type": "string",
+      "label": "Black Duck Version Name",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Name of Black Duck version"
+    },
+    {
+      "name": "failOnSecurityRisks",
+      "type": "boolean",
+      "label": "Fail on security risks",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Fail task on CRITICAL or HIGH security risks. Defaults to true."
+    },
+    {
+      "name": "securityExclusions",
+      "type": "string",
+      "label": "List of security component names to exclude from checks",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "List of security component names to exclude from task checking delineated by comma space (, )."
+    },
+    {
+      "name": "failOnLicenseRisks",
+      "type": "boolean",
+      "label": "Fail on license risks",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Fail task on HIGH license risks."
+    },
+    {
+      "name": "licenseExclusions",
+      "type": "string",
+      "label": "List of licenses to exclude from checks",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "List of licenses to exclude from task checking delineated by comma space (, )."
+    },
+    {
+      "name": "failOnPolicyViolations",
+      "type": "boolean",
+      "label": "Fail on policy violations",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Fail task on policy violations."
+    },
+    {
+      "name": "policyExclusions",
+      "type": "string",
+      "label": "List of policy names to exclude from checks",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "List of policy names to exclude from task checking delineated by comma space (, )."
     }
+  ],
+  "execution": {
+    "Node10": {
+      "target": "./dist/index.js"
+    }
+  }
 }

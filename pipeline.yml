@@ -1,0 +1,29 @@
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Use Node 10'
+
+- script: npm i -g tfx-cli
+  displayName: 'Install TFX-CLI'
+
+- script: node version.js $(taskVersion)
+  displayName: 'Set Task Version'
+
+- task: Npm@1
+  displayName: 'Create Package'
+  inputs:
+    command: custom
+    customCommand: 'run create'
+    customRegistry: useFeed
+    customFeed: '35b678c1-d302-4922-be1c-e2e7525d5204'
+
+- publish: 'ProductTech.alle-bd-sec-scan-$(taskVersion).vsix'
+  artifact: task
+  displayName: 'Publish Task'

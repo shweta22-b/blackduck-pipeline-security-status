@@ -1,41 +1,41 @@
 {
-    "manifestVersion": 1,
-    "id": "alle-bd-sec-scan",
-    "name": "Alle BlackDuck Security Scan",
-    "version": "1.0.0",
-    "publisher": "ProductTech",
-    "targets": [
-        {
-            "id": "Microsoft.VisualStudio.Services"
-        }
-    ],
-    "description": "Simple check for Black Duck Security Violations",
-    "categories": [
-        "Azure Pipelines"
-    ],
-    "icons": {
-        "default": "images/extension-icon.png"
+  "manifestVersion": 1,
+  "id": "alle-bd-sec-scan",
+  "name": "Alle BlackDuck Security Scan",
+  "version": "1.0.1",
+  "publisher": "ProductTech",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Simple check for Black Duck Security Violations",
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "files": [
+    {
+      "path": "bdscan"
     },
-    "files": [
-        {
-            "path": "bdscan"
-        },
-        {
-            "path": "./bdscan/node_modules/vss-web-extension-sdk/lib",
-            "addressable": true,
-            "packagePath": "lib"
-        }
-    ],
-    "contributions": [
-        {
-            "id": "alle-bd-sec-scan-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "bdscan"
-            }
-        }
-    ]
+    {
+      "path": "./bdscan/node_modules/vss-web-extension-sdk/lib",
+      "addressable": true,
+      "packagePath": "lib"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "alle-bd-sec-scan-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "bdscan"
+      }
+    }
+  ]
 }
