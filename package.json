@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "install": "cd ./bdscan && npm install",
-    "test": "cd ./bdscan/tests && tsc && jest -- index.test.js",
+    "test": "cd ./bdscan && npm run test",
     "build": "cd ./bdscan && npm run build",
     "package": "tfx extension create --manifest-globs vss-extension.json",
     "create": "npm install && npm run build && npm run package"

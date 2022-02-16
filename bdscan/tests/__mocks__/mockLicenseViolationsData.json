@@ -1,0 +1,638 @@
+{
+    "totalCount": 2,
+    "items": [
+        {
+            "componentName": "Criipto.Configuration",
+            "componentVersionName": "0.2.0",
+            "component": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123",
+            "componentVersion": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123",
+            "totalFileMatchCount": 1,
+            "licenses": [
+                {
+                    "licenseDisplay": "Unknown License",
+                    "license": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/licenses/LICENSEGUIDID",
+                    "licenses": [],
+                    "ownership": "UNKNOWN"
+                }
+            ],
+            "origins": [
+                {
+                    "name": "0.2.0",
+                    "origin": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins/COMPONENTORIGINGUID123",
+                    "externalNamespace": "nuget",
+                    "externalId": "Criipto.Configuration/0.2.0",
+                    "externalNamespaceDistribution": false,
+                    "_meta": {
+                        "allow": [],
+                        "links": [
+                            {
+                                "rel": "origin",
+                                "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins/COMPONENTORIGINGUID123"
+                            },
+                            {
+                                "rel": "matched-files",
+                                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins/COMPONENTORIGINGUID123/matched-files"
+                            },
+                            {
+                                "rel": "upgrade-guidance",
+                                "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins/COMPONENTORIGINGUID123/upgrade-guidance"
+                            },
+                            {
+                                "rel": "component-origin-copyrights",
+                                "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins/COMPONENTORIGINGUID123/copyrights"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "usages": [
+                "DYNAMICALLY_LINKED"
+            ],
+            "ignored": false,
+            "matchTypes": [
+                "FILE_SOME_FILES_MODIFIED"
+            ],
+            "releasedOn": "2021-11-22T23:57:57.535Z",
+            "licenseRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 0
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 1
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "securityRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 381
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "versionRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 1
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "activityRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 1
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "operationalRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 1
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "activityData": {
+                "lastCommitDate": "2021-11-19T10:07:57.797Z",
+                "newerReleases": 1
+            },
+            "reviewStatus": "NOT_REVIEWED",
+            "approvalStatus": "IN_VIOLATION",
+            "policyStatus": "IN_VIOLATION",
+            "manuallyAdjusted": false,
+            "componentModified": false,
+            "inAttributionReport": true,
+            "componentType": "KB_COMPONENT",
+            "_meta": {
+                "allow": [
+                    "GET",
+                    "PUT"
+                ],
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123",
+                "links": [
+                    {
+                        "rel": "comments",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/component-versions/COMPONENTVERSIONGUID123/comments"
+                    },
+                    {
+                        "rel": "component-issues",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/component-versions/COMPONENTVERSIONGUID123/issues"
+                    },
+                    {
+                        "rel": "policy-rules",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/policy-rules"
+                    },
+                    {
+                        "rel": "vulnerabilities",
+                        "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/vulnerabilities"
+                    },
+                    {
+                        "rel": "matched-files",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins/COMPONENTORIGINGUID123/matched-files"
+                    },
+                    {
+                        "rel": "origins",
+                        "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/origins"
+                    },
+                    {
+                        "rel": "policy-status",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/policy-status"
+                    },
+                    {
+                        "rel": "bom-component-version-license",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/license-adjustment"
+                    },
+                    {
+                        "rel": "upgrade-guidance",
+                        "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/COMPONENTVERSIONGUID123/upgrade-guidance"
+                    }
+                ]
+            }
+        },
+        {
+            "componentName": "Pickles.CommandLine.win",
+            "componentVersionName": "3.0.0-alpha.4",
+            "component": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123",
+            "componentVersion": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123",
+            "totalFileMatchCount": 3,
+            "licenses": [
+                {
+                    "licenseDisplay": "Unknown License",
+                    "license": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/licenses/LICENSEGUIDID",
+                    "licenses": [],
+                    "ownership": "UNKNOWN"
+                }
+            ],
+            "origins": [
+                {
+                    "name": "3.0.0-alpha.4",
+                    "origin": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/origins/COMPONENTVERSIONGUID",
+                    "externalNamespace": "nuget",
+                    "externalId": "Pickles.CommandLine.win/3.0.0-alpha.4",
+                    "externalNamespaceDistribution": false,
+                    "_meta": {
+                        "allow": [],
+                        "links": [
+                            {
+                                "rel": "origin",
+                                "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/origins/COMPONENTVERSIONGUID"
+                            },
+                            {
+                                "rel": "matched-files",
+                                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/origins/COMPONENTVERSIONGUID/matched-files"
+                            },
+                            {
+                                "rel": "upgrade-guidance",
+                                "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/origins/COMPONENTVERSIONGUID/upgrade-guidance"
+                            },
+                            {
+                                "rel": "component-origin-copyrights",
+                                "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/origins/COMPONENTVERSIONGUID/copyrights"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "usages": [
+                "DYNAMICALLY_LINKED"
+            ],
+            "ignored": false,
+            "matchTypes": [
+                "FILE_EXACT"
+            ],
+            "releasedOn": "2022-01-26T22:16:46.773Z",
+            "licenseRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 0
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 1
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "securityRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 109
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "versionRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 1
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "activityRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 1
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "operationalRiskProfile": {
+                "counts": [
+                    {
+                        "countType": "UNKNOWN",
+                        "count": 0
+                    },
+                    {
+                        "countType": "OK",
+                        "count": 1
+                    },
+                    {
+                        "countType": "LOW",
+                        "count": 0
+                    },
+                    {
+                        "countType": "MEDIUM",
+                        "count": 0
+                    },
+                    {
+                        "countType": "HIGH",
+                        "count": 0
+                    },
+                    {
+                        "countType": "CRITICAL",
+                        "count": 0
+                    }
+                ]
+            },
+            "activityData": {
+                "lastCommitDate": "2021-10-04T16:08:53.280Z",
+                "newerReleases": 1
+            },
+            "reviewStatus": "NOT_REVIEWED",
+            "approvalStatus": "IN_VIOLATION",
+            "policyStatus": "IN_VIOLATION",
+            "manuallyAdjusted": false,
+            "componentModified": false,
+            "inAttributionReport": true,
+            "componentType": "KB_COMPONENT",
+            "_meta": {
+                "allow": [
+                    "GET",
+                    "PUT"
+                ],
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123",
+                "links": [
+                    {
+                        "rel": "comments",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/component-versions/VERSIONGUID123/comments"
+                    },
+                    {
+                        "rel": "component-issues",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/component-versions/VERSIONGUID123/issues"
+                    },
+                    {
+                        "rel": "policy-rules",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/policy-rules"
+                    },
+                    {
+                        "rel": "vulnerabilities",
+                        "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/vulnerabilities"
+                    },
+                    {
+                        "rel": "matched-files",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/origins/COMPONENTVERSIONGUID/matched-files"
+                    },
+                    {
+                        "rel": "origins",
+                        "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/origins"
+                    },
+                    {
+                        "rel": "policy-status",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/policy-status"
+                    },
+                    {
+                        "rel": "bom-component-version-license",
+                        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components/COMPONENTGUID123/versions/VERSIONGUID123/license-adjustment"
+                    },
+                    {
+                        "rel": "upgrade-guidance",
+                        "href": "https://allegion.blackducksoftware.com/api/components/COMPONENTGUID123/versions/VERSIONGUID123/upgrade-guidance"
+                    }
+                ]
+            }
+        }
+    ],
+    "appliedFilters": [
+        {
+            "name": "licenseRisk",
+            "label": "License Risk",
+            "selected": [
+                {
+                    "key": "high",
+                    "label": "High"
+                }
+            ]
+        }
+    ],
+    "_meta": {
+        "allow": [
+            "POST",
+            "GET"
+        ],
+        "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components",
+        "links": [
+            {
+                "rel": "quick-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=adjusted",
+                "name": "adjusted",
+                "label": "Adjusted"
+            },
+            {
+                "rel": "dynamic-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomComponents",
+                "name": "bomComponents",
+                "label": "Component"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomInclusion",
+                "name": "bomInclusion",
+                "label": "Ignore"
+            },
+            {
+                "rel": "dynamic-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomLicense",
+                "name": "bomLicense",
+                "label": "License"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=licenseRisk",
+                "name": "licenseRisk",
+                "label": "License Risk"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomMatchReviewStatus",
+                "name": "bomMatchReviewStatus",
+                "label": "Match Status"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomMatchType",
+                "name": "bomMatchType",
+                "label": "Match Type"
+            },
+            {
+                "rel": "quick-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=missingData",
+                "name": "missingData",
+                "label": "Missing Custom Field Data"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomAttribution",
+                "name": "bomAttribution",
+                "label": "Notices File Report"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=operationalRisk",
+                "name": "operationalRisk",
+                "label": "Operational Risk"
+            },
+            {
+                "rel": "dynamic-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=policyRuleViolation",
+                "name": "policyRuleViolation",
+                "label": "Policy Rule"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=policyCategory",
+                "name": "policyCategory",
+                "label": "Policy Rule Category"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=policyRuleSeverity",
+                "name": "policyRuleSeverity",
+                "label": "Policy Rule Severity"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomPolicy",
+                "name": "bomPolicy",
+                "label": "Policy Violations"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomReviewStatus",
+                "name": "bomReviewStatus",
+                "label": "Review Status"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=securityRisk",
+                "name": "securityRisk",
+                "label": "Security Risk"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomComponentSource",
+                "name": "bomComponentSource",
+                "label": "Source/Type"
+            },
+            {
+                "rel": "quick-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=unknownVersion",
+                "name": "unknownVersion",
+                "label": "Unknown Version"
+            },
+            {
+                "rel": "static-filter",
+                "href": "https://allegion.blackducksoftware.com/api/projects/PROJECTGUID123/versions/VERSIONGUID123/components-filters?filterKey=bomUsage",
+                "name": "bomUsage",
+                "label": "Usage"
+            }
+        ]
+    }
+}

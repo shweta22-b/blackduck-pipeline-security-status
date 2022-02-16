@@ -1,5 +1,6 @@
 import { IBlackDuckToken } from '../src/models/IBlackDuckToken';
 import versionData from './__mocks__/mockVersionData.json';
+import licenseData from './__mocks__/mockLicenseViolationsData.json'
 import projectData from './__mocks__/mockProjectData.json';
 import vulnerabilityData from './__mocks__/mockVulnerabilityData.json';
 import policyData from './__mocks__/mockPolicyViolationsData.json'
@@ -48,13 +49,14 @@ describe('Black Duck Checks', () => {
         expect(await blackduckCheck.checkViolations(securityRisks)).toEqual(true);
     });
 
-    test('Should return false based off one exclusion', async () => {
+    test('Should return true based off one security exclusion', async () => {
         const vulDataString = JSON.stringify(vulnerabilityData)
         const vulData:IBlackDuckViolations = JSON.parse(vulDataString);
         const mockInputExclusionString = "aspnet/AspNetCore";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items);
-        expect(mockSecRisks[0].risk).toEqual(false);
+        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items, "security");
+        const mappedRisks = mockSecRisks.map(comp => comp.risk);
+        expect(mappedRisks.includes(false)).toEqual(true);
     });
 
     test('Should return a length of 2 with no security exclusions', async () => {
@@ -62,45 +64,37 @@ describe('Black Duck Checks', () => {
         const vulData: IBlackDuckViolations = JSON.parse(vulDataString);
         const mockInputExclusionString = "";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items);
+        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items, "security");
         expect(mockSecRisks.length).toEqual(2);
-    });
-
-    test('Should return true with no security exclusions', async () => {
-        const verDataString = JSON.stringify(versionData)
-        const verData: IBlackDuckVersion = JSON.parse(verDataString);
-        const mockInputExclusionString = "";
-        const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockSecRisks: IRiskState[] = await blackduckCheck.failOnSecurityRisks(verData, mockExclusionArray);
-        expect(mockSecRisks.some(comp => comp.risk === true)).toEqual(true);
+        const listComps: IRiskState[] = await blackduckCheck.listComponents(vulData.items, "security");
+        expect(listComps.length).toEqual(2);
     });
 
     test('Should return a length of 2 with no policy exclusions', async () => {
-        const polDataString = JSON.stringify(policyData);
+        const polDataString = JSON.stringify(licenseData);
         const polData: IBlackDuckViolations = JSON.parse(polDataString);
         const mockInputExclusionString = "";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items);
+        const mockPolRisks: IRiskState[] = await blackduckCheck.listComponents(polData.items, "policy");
         expect(mockPolRisks.length).toEqual(2);
     });
 
-    test('Should return a length of two with one policy exclusions', async () => {
-        const polDataString = JSON.stringify(policyData);
-        const polData: IBlackDuckViolations = JSON.parse(polDataString);
-        const mockInputExclusionString = "Microsoft.Azure.DurableTask.AzureStorage";
+    test('Should return true with one license exclusions', async () => {
+        const licDataString = JSON.stringify(licenseData);
+        const licData: IBlackDuckViolations = JSON.parse(licDataString);
+        const mockInputExclusionString = "Criipto.Configuration";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items);
-        expect(mockPolRisks.length).toEqual(2);
+        const mockLicRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, licData.items, "license");
+        const mappedRisks = mockLicRisks.map(comp => comp.risk);
+        expect(mappedRisks.includes(false)).toEqual(true);
     });
 
-    test('Should return false with two security exclusions', async () => {
-        const polDataString = JSON.stringify(policyData);
-        const polData: IBlackDuckViolations = JSON.parse(polDataString);
-        const mockInputExclusionString = "Microsoft.Azure.DurableTask.AzureStorage, HIC.RDMP.Plugin";
+    test('Should return false with two license exclusions', async () => {
+        const licDataString = JSON.stringify(licenseData);
+        const polData: IBlackDuckViolations = JSON.parse(licDataString);
+        const mockInputExclusionString = "Criipto.Configuration, Pickles.CommandLine.win";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        console.log(mockExclusionArray);
-        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items);
-        console.log(`mock data: ${mockPolRisks[0].risk} ${mockPolRisks[1].risk}`);
+        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items, "license");
         expect(mockPolRisks.some(comp => comp.risk === true)).toEqual(false);
     });
 

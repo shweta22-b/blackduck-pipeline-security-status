@@ -28,11 +28,19 @@ async function run() {
         
         /* Check licenses */
         const failOnLicenseSelection = task.getBoolInput('failOnLicenseRisks', false);
+        const licenseExclusionsList = task.getInput('licenseExclusions', false);
+        let licenseList = licenseExclusionsList === undefined ? [] : licenseExclusionsList.split(', ');
         if (failOnLicenseSelection){
-            const licenseCheck = await blackduckCheck.failOnLicenseRisks(blackDuckData);
-            if (licenseCheck.risk){
-                task.setResult(task.TaskResult.Failed, licenseCheck.message, true);
-            }
+            const licenseCheck = await blackduckCheck.failOnLicenseRisks(blackDuckData, licenseList);
+            licenseCheck.forEach((riskAssessment) => {
+                if (riskAssessment.risk)
+                {
+                    task.setResult(task.TaskResult.Failed, riskAssessment.message, true);
+                }
+                else {
+                    task.setResult(task.TaskResult.Succeeded, riskAssessment.message)
+                }
+            });
         }
 
         /* Security check*/

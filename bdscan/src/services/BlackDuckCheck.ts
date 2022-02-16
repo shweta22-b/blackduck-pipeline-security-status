@@ -70,15 +70,14 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
             {
                 const violationUrl = `${bdData.items[0]._meta.href}/vulnerable-bom-components`;
                 const securityRisks:IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
-                result = await this.checkExclusions(exclusionList, securityRisks.items)
+                result = await this.checkExclusions(exclusionList, securityRisks.items, "security");
             }
             else if (severityCheck) {
                 message = "Critical or high security risks detected"
-                const riskAssessment = {
-                    risk: severityCheck,
-                    message: message
-                }
-                result.push(riskAssessment);
+                console.log(message);
+                const violationUrl = `${bdData.items[0]._meta.href}/vulnerable-bom-components`;
+                const securityRisks: IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
+                result = await this.listComponents(securityRisks.items, "security");
             }
             else
             {
@@ -89,10 +88,6 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
                 }
                 result.push(riskAssessment);
             }
-            result.forEach((msg) => {
-                msg.risk
-                console.log(msg)
-            });
             return result
         } 
         catch (error) {
@@ -100,23 +95,35 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
 
-    async failOnLicenseRisks(bdData: IBlackDuckVersion): Promise<IRiskState> {
+    async failOnLicenseRisks(bdData: IBlackDuckVersion, exclusionList: string[]): Promise<IRiskState[]> {
         console.log("Checking for license risks...");
         try {
             let versionLicenseRisk = bdData.items[0].licenseRiskProfile.counts;
             let licenseCheck: boolean = await this.checkViolations(versionLicenseRisk);
             let message: string;
-            if (licenseCheck) {
+            let result: IRiskState[] = [];
+            if (licenseCheck && exclusionList.length > 0) {
                 message = "A critical or high license risk was detected"
+                const licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh`;
+                const licenseRisks: IBlackDuckViolations = await this.getViolations(licenseUrl, this.bearerToken);
+                result = await this.checkExclusions(exclusionList, licenseRisks.items, "license");
+            }
+            else if (licenseCheck) {
+                message = "A critical or high license risk was detected"
+                const licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh`;
+                const licenseRisks: IBlackDuckViolations = await this.getViolations(licenseUrl, this.bearerToken);
+                result = await this.listComponents(licenseRisks.items, "license");
             }
             else {
                 message = "No critical or high license risks were detected"
+                const riskAssessment = {
+                    risk: licenseCheck,
+                    message: message
+                }
+                console.log(message);
+                result.push(riskAssessment);
             }
-            console.log(message);
-            return {
-                risk: licenseCheck,
-                message: message
-            }
+            return result; 
             
         } catch (error) {
             console.log(error);
@@ -134,16 +141,13 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
             if (poilicyCheck && exclusionList.length > 0) {
                 const policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
                 const policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
-                result = await this.checkExclusions(exclusionList, policyRisks.items)
+                result = await this.checkExclusions(exclusionList, policyRisks.items, "policy")
             }
             else if (poilicyCheck) {
                 message = "A policy violation was detected";
-                const riskAssessment = {
-                    risk: poilicyCheck,
-                    message: message
-                }
-                console.log(message);
-                result.push(riskAssessment);
+                const policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
+                const policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
+                result = await this.listComponents(policyRisks.items, "policy")
             }
             else {
                 message = "No policy violations were detected";
@@ -164,7 +168,7 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
 
-    async checkExclusions(exclusionList: string[], risks: ViolationsItem[]): Promise<IRiskState[]> {
+    async checkExclusions(exclusionList: string[], risks: ViolationsItem[], label: string): Promise<IRiskState[]> {
         let message: string;
         let result: IRiskState[] = [];
         for (const component of risks)
@@ -172,7 +176,7 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
             let riskAssessment: IRiskState;
             if (exclusionList.includes(component.componentName))
             {
-                message = `EXCLUDED: ${component.componentName} from risk assessment.`;
+                message = `EXCLUDED: ${component.componentName} from ${label} risk assessment.`;
                 console.log(message);
                 riskAssessment = {
                     risk: false,
@@ -182,7 +186,7 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
             }
             else
             {
-                message = `${component.componentName} is a risk.`
+                message = `${component.componentName} is a ${label} risk.`
                 console.log(message);
                 riskAssessment = {
                     risk: true,
@@ -190,6 +194,23 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
                 }
                 result.push(riskAssessment);
             }
+        }
+        return result;
+    }
+
+    async listComponents(risks: ViolationsItem[], label): Promise<IRiskState[]> {
+        let message: string;
+        let result: IRiskState[] = [];
+        for (const component of risks)
+        {
+            let riskAssessment: IRiskState;
+            message = `${component.componentName} is ${label} a risk.`
+            console.log(message);
+            riskAssessment = {
+                risk: true,
+                message: message
+            }
+            result.push(riskAssessment);
         }
         return result;
     }
