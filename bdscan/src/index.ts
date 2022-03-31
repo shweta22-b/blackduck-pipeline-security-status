@@ -10,20 +10,30 @@ import { BlackDuckAPICalls } from './services/BlackDuckAPICalls'
 
 async function run() {
     try {
-        const bdService = task.getInput('blackduckconnection', true);
+        const bdService = task.getInput('blackduckconnection', false);
+        const bdTkn = task.getInput('blackducktoken', false);
         const bdProjectName = task.getInput('projectName', true);
         const bdVersionName = task.getInput('versionName', true);
-        const baseUrl = "allegion.blackducksoftware.com"
-        if (bdService === undefined){
-            task.setResult(task.TaskResult.Failed, 'Need Black Duck connection string');
+        const baseUrl = "allegion.blackducksoftware.com";
+        let blackduckCheck: BlackDuckCheck;
+        
+        if (bdService === undefined && bdTkn === undefined){
+            task.setResult(task.TaskResult.Failed, 'Need Black Duck connection string or token');
             return
         }
-        /* Get Black Duck Token */
-        let bdCreds: IBlackDuckConfig = await getBlackDuckCredentials(bdService);
-        task.setSecret(bdCreds.blackduckApiToken);
+
+        /* Get Black Duck Token from Service Connection*/
+        else if(bdTkn === undefined && typeof bdService !== undefined) {
+            let bdCreds: IBlackDuckConfig = await getBlackDuckCredentials(bdService);
+            task.setSecret(bdCreds.blackduckApiToken);
+            blackduckCheck = new BlackDuckCheck(bdCreds.blackduckApiToken, bdProjectName, bdVersionName, baseUrl);
+        }
         
+        else if (bdService === undefined && typeof bdTkn !== undefined) {
+            task.setSecret(bdTkn);
+            blackduckCheck = new BlackDuckCheck(bdTkn, bdProjectName, bdVersionName, baseUrl);
+        }
         /* Run BlackDuck API Calls */
-        let blackduckCheck = new BlackDuckCheck(bdCreds.blackduckApiToken, bdProjectName, bdVersionName, baseUrl);
         let blackDuckData: IBlackDuckVersion = await blackduckCheck.callBlackDuckAPI();
         
         /* Check licenses */

@@ -1,16 +1,16 @@
 import { IBlackDuckToken } from '../src/models/IBlackDuckToken';
-import versionData from './__mocks__/mockVersionData.json';
-import licenseData from './__mocks__/mockLicenseViolationsData.json'
-import projectData from './__mocks__/mockProjectData.json';
-import vulnerabilityData from './__mocks__/mockVulnerabilityData.json';
-import policyData from './__mocks__/mockPolicyViolationsData.json'
+import * as versionData from './__mocks__/mockVersionData.json';
+import * as licenseData from './__mocks__/mockLicenseViolationsData.json'
+import * as projectData from './__mocks__/mockProjectData.json';
+import * as vulnerabilityData from './__mocks__/mockVulnerabilityData.json';
+import * as policyData from './__mocks__/mockPolicyViolationsData.json'
 import { IRequestOptions } from '../src/models/IRequestOptions';
 import { BlackDuckCheck } from '../src/services/BlackDuckCheck';
 import { IBlackDuckProject } from '../src/models/IBlackDuckProject';
 import { DetectADOConstants } from '../src/lib/BlackDuckConstants'
-import manswer = require('azure-pipelines-task-lib/mock-answer');
-import trunner = require('azure-pipelines-task-lib/mock-run');
-import path = require('path');
+import * as manswer from 'azure-pipelines-task-lib/mock-answer';
+import * as trunner from 'azure-pipelines-task-lib/mock-run';
+import * as path from 'path';
 import { IBlackDuckVersion } from '../src/models/IBlackDuckVersion';
 import { IRiskState } from '../src/models/IRiskState';
 import { IBlackDuckViolations } from '../src/models/IBlackDuckViolations';
@@ -39,22 +39,12 @@ describe('Black Duck Checks', () => {
         expect (blackduckCheck).toBeTruthy();
     });
 
-    test('Should return true when looking for HIGH license risks', async () => {
-        const licenseRisks = versionData.items[0].licenseRiskProfile.counts;
-        expect(await blackduckCheck.checkViolations(licenseRisks)).toEqual(true);
-    });
-
-    test('Should return true when looking for CRITICAL security risks', async () => {
-        const securityRisks = versionData.items[0].securityRiskProfile.counts;
-        expect(await blackduckCheck.checkViolations(securityRisks)).toEqual(true);
-    });
-
     test('Should return true based off one security exclusion', async () => {
         const vulDataString = JSON.stringify(vulnerabilityData)
         const vulData:IBlackDuckViolations = JSON.parse(vulDataString);
         const mockInputExclusionString = "aspnet/AspNetCore";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items, "security");
+        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items, vulData.totalCount, "security");
         const mappedRisks = mockSecRisks.map(comp => comp.risk);
         expect(mappedRisks.includes(false)).toEqual(true);
     });
@@ -64,9 +54,9 @@ describe('Black Duck Checks', () => {
         const vulData: IBlackDuckViolations = JSON.parse(vulDataString);
         const mockInputExclusionString = "";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items, "security");
+        const mockSecRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, vulData.items, vulData.totalCount, "security");
         expect(mockSecRisks.length).toEqual(2);
-        const listComps: IRiskState[] = await blackduckCheck.listComponents(vulData.items, "security");
+        const listComps: IRiskState[] = await blackduckCheck.listComponents(vulData.items, vulData.totalCount, "security");
         expect(listComps.length).toEqual(2);
     });
 
@@ -75,7 +65,7 @@ describe('Black Duck Checks', () => {
         const polData: IBlackDuckViolations = JSON.parse(polDataString);
         const mockInputExclusionString = "";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockPolRisks: IRiskState[] = await blackduckCheck.listComponents(polData.items, "policy");
+        const mockPolRisks: IRiskState[] = await blackduckCheck.listComponents(polData.items, polData.totalCount, "policy");
         expect(mockPolRisks.length).toEqual(2);
     });
 
@@ -84,7 +74,7 @@ describe('Black Duck Checks', () => {
         const licData: IBlackDuckViolations = JSON.parse(licDataString);
         const mockInputExclusionString = "Criipto.Configuration";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockLicRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, licData.items, "license");
+        const mockLicRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, licData.items, licData.totalCount, "license");
         const mappedRisks = mockLicRisks.map(comp => comp.risk);
         expect(mappedRisks.includes(false)).toEqual(true);
     });
@@ -94,10 +84,7 @@ describe('Black Duck Checks', () => {
         const polData: IBlackDuckViolations = JSON.parse(licDataString);
         const mockInputExclusionString = "Criipto.Configuration, Pickles.CommandLine.win";
         const mockExclusionArray = mockInputExclusionString.length > 0 ? mockInputExclusionString.split(', ') : [];
-        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items, "license");
+        const mockPolRisks: IRiskState[] = await blackduckCheck.checkExclusions(mockExclusionArray, polData.items, polData.totalCount, "license");
         expect(mockPolRisks.some(comp => comp.risk === true)).toEqual(false);
     });
-
-
 })
-

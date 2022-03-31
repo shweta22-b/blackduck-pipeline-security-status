@@ -10,7 +10,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 1
+    "Patch": 3
   },
   "instanceNameFormat": "Black Duck Vulnerability Result",
   "inputs": [
@@ -19,8 +19,16 @@
       "type": "connectedService:SynopsysBlackDuck",
       "label": "Service connection name for Black Duck",
       "defaultValue": "",
-      "required": true,
+      "required": false,
       "helpMarkDown": "connection string name"
+    },
+    {
+      "name": "blackducktoken",
+      "type": "string",
+      "label": "API token for Black Duck",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "black duck token"
     },
     {
       "name": "projectName",

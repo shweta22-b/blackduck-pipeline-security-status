@@ -54,7 +54,7 @@ export class BlackDuckAPICalls {
             port: 443,
             headers: {
                 'Authorization': `Bearer ${_bearerToken}`,
-                'Accept': '*/*'
+                'Accept': 'application/vnd.blackducksoftware.project-detail-5+json'
             }
         }
         return await this.getRequest(_url, options);

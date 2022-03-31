@@ -12,72 +12,22 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         super(_bdToken, _bdProjectName, _bdVersionName, _baseUrl);
     }
 
-    async checkViolations(violationProfiles: Count[] | undefined): Promise<boolean> {
-        let value = false;
-        if (violationProfiles === undefined)
-        {
-            return true
-        }
-        violationProfiles.forEach(item => {
-            if (item.countType.toUpperCase() == 'CRITICAL' || item.countType.toUpperCase() == 'HIGH')
-            {
-                if (item.count > 0)
-                {
-                    value = true;
-                }
-            }
-        });
-        if (value)
-        {
-            return true
-        }
-        else
-        {
-            return false
-        }
-    }
-
-    async checkPolicy(policyProfile: PolicyStatusSummaries[]): Promise<boolean> {
-        let value = false;
-        if (policyProfile === undefined)
-        {
-            return true
-        }
-        policyProfile.forEach(item => {
-            if (item.status.toUpperCase() == 'IN_VIOLATION')
-            {
-                value = true;
-            }
-        });
-        if (value)
-        {
-            return true
-        }
-        else
-        {
-            return false
-        }
-    }
-
     async failOnSecurityRisks(bdData: IBlackDuckVersion, exclusionList:string[] ): Promise<IRiskState[]> {
         console.log("Checking for security risks...");
         try {
-            let versionSecurityRisk = bdData.items[0].securityRiskProfile.counts;
-            let severityCheck: boolean = await this.checkViolations(versionSecurityRisk);
             let message: string;
             let result: IRiskState[] = [];
+            let violationUrl = `${bdData.items[0]._meta.href}/components?filter=securityRisk%3Ahigh&filter=securityRisk%3Acritical`;
+            let securityRisks: IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
+            let severityCheck: boolean = securityRisks.totalCount > 0 ? true : false
             if (severityCheck && exclusionList.length > 0)
             {
-                const violationUrl = `${bdData.items[0]._meta.href}/vulnerable-bom-components`;
-                const securityRisks:IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
-                result = await this.checkExclusions(exclusionList, securityRisks.items, "security");
+                result = await this.checkExclusions(exclusionList, securityRisks.items, securityRisks.totalCount, "security");
             }
             else if (severityCheck) {
                 message = "Critical or high security risks detected"
                 console.log(message);
-                const violationUrl = `${bdData.items[0]._meta.href}/vulnerable-bom-components`;
-                const securityRisks: IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
-                result = await this.listComponents(securityRisks.items, "security");
+                result = await this.listComponents(securityRisks.items, securityRisks.totalCount, "security");
             }
             else
             {
@@ -98,21 +48,18 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
     async failOnLicenseRisks(bdData: IBlackDuckVersion, exclusionList: string[]): Promise<IRiskState[]> {
         console.log("Checking for license risks...");
         try {
-            let versionLicenseRisk = bdData.items[0].licenseRiskProfile.counts;
-            let licenseCheck: boolean = await this.checkViolations(versionLicenseRisk);
             let message: string;
             let result: IRiskState[] = [];
+            let licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh`;
+            let licenseRisks: IBlackDuckViolations = await this.getViolations(licenseUrl, this.bearerToken);
+            let licenseCheck: boolean = licenseRisks.totalCount > 0 ? true : false;
             if (licenseCheck && exclusionList.length > 0) {
                 message = "A critical or high license risk was detected"
-                const licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh`;
-                const licenseRisks: IBlackDuckViolations = await this.getViolations(licenseUrl, this.bearerToken);
-                result = await this.checkExclusions(exclusionList, licenseRisks.items, "license");
+                result = await this.checkExclusions(exclusionList, licenseRisks.items, licenseRisks.totalCount, "license");
             }
             else if (licenseCheck) {
                 message = "A critical or high license risk was detected"
-                const licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh`;
-                const licenseRisks: IBlackDuckViolations = await this.getViolations(licenseUrl, this.bearerToken);
-                result = await this.listComponents(licenseRisks.items, "license");
+                result = await this.listComponents(licenseRisks.items, licenseRisks.totalCount, "license");
             }
             else {
                 message = "No critical or high license risks were detected"
@@ -134,20 +81,18 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         console.log("Checking for policy violations...");
         try
         {
-            let policyVersionRisk = versionDetails.items[0].policyStatusSummaries;
-            let poilicyCheck: boolean = await this.checkPolicy(policyVersionRisk);
+            let policyVersionRisk = versionDetails.items[0].policyStatusSummaries; 
             let message: string;
             let result: IRiskState[] = [];
+            let policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
+            let policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
+            let poilicyCheck: boolean = policyRisks.totalCount > 0 ? true : false;
             if (poilicyCheck && exclusionList.length > 0) {
-                const policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
-                const policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
-                result = await this.checkExclusions(exclusionList, policyRisks.items, "policy")
+                result = await this.checkExclusions(exclusionList, policyRisks.items, policyRisks.totalCount, "policy")
             }
             else if (poilicyCheck) {
                 message = "A policy violation was detected";
-                const policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
-                const policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
-                result = await this.listComponents(policyRisks.items, "policy")
+                result = await this.listComponents(policyRisks.items, policyRisks.totalCount, "policy")
             }
             else {
                 message = "No policy violations were detected";
@@ -168,7 +113,7 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
 
-    async checkExclusions(exclusionList: string[], risks: ViolationsItem[], label: string): Promise<IRiskState[]> {
+    async checkExclusions(exclusionList: string[], risks: ViolationsItem[], violationCount: number, label: string): Promise<IRiskState[]> {
         let message: string;
         let result: IRiskState[] = [];
         for (const component of risks)
@@ -195,16 +140,37 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
                 result.push(riskAssessment);
             }
         }
+        if (violationCount > 10)
+        {
+            let riskAssessment: IRiskState;
+            message = `More than ${violationCount} ${label} risks were found.`
+            console.log(message);
+            riskAssessment = {
+                risk: true,
+                message: message
+            }
+            result.push(riskAssessment);
+        }
         return result;
     }
 
-    async listComponents(risks: ViolationsItem[], label): Promise<IRiskState[]> {
+    async listComponents(risks: ViolationsItem[], violationCount: number, label): Promise<IRiskState[]> {
         let message: string;
         let result: IRiskState[] = [];
         for (const component of risks)
         {
             let riskAssessment: IRiskState;
-            message = `${component.componentName} is ${label} a risk.`
+            message = `${component.componentName} is a ${label} risk.`
+            console.log(message);
+            riskAssessment = {
+                risk: true,
+                message: message
+            }
+            result.push(riskAssessment);
+        }
+        if (violationCount > 10) {
+            let riskAssessment: IRiskState;
+            message = `More than ${violationCount} ${label} risks were found.`
             console.log(message);
             riskAssessment = {
                 risk: true,
