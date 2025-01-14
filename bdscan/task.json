@@ -16,7 +16,7 @@
   "inputs": [
     {
       "name": "blackduckconnection",
-      "type": "connectedService:SynopsysBlackDuck",
+      "type": "connectedService:blackducksca",
       "label": "Service connection name for Black Duck",
       "defaultValue": "",
       "required": false,
