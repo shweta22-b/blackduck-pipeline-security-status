@@ -16,11 +16,11 @@
   "inputs": [
     {
       "name": "blackduckconnection",
-      "type": "connectedService:blackducksca",
+      "type": "connectedService:BlackDuckSca",
       "label": "Service connection name for Black Duck",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "connection string name"
+      "helpMarkDown": "Black Duck service connection name"
     },
     {
       "name": "blackducktoken",
@@ -28,7 +28,7 @@
       "label": "API token for Black Duck",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "black duck token"
+      "helpMarkDown": "Black Duck API token"
     },
     {
       "name": "projectName",
