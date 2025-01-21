@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
-  "id": "alle-bd-sec-scan-test",
-  "name": "Alle BlackDuck Security Scan Test",
+  "id": "alle-bd-sec-scan",
+  "name": "Alle BlackDuck Security Scan",
   "version": "2.0.0",
   "publisher": "ProductTech",
   "targets": [
