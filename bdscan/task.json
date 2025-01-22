@@ -8,19 +8,19 @@
   "category": "Utility",
   "author": "ProductTech",
   "version": {
-    "Major": 1,
+    "Major": 2,
     "Minor": 0,
-    "Patch": 3
+    "Patch": 0
   },
   "instanceNameFormat": "Black Duck Vulnerability Result",
   "inputs": [
     {
       "name": "blackduckconnection",
-      "type": "connectedService:SynopsysBlackDuck",
+      "type": "connectedService:BlackDuckSca",
       "label": "Service connection name for Black Duck",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "connection string name"
+      "helpMarkDown": "Black Duck service connection name"
     },
     {
       "name": "blackducktoken",
@@ -28,7 +28,7 @@
       "label": "API token for Black Duck",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "black duck token"
+      "helpMarkDown": "Black Duck API token"
     },
     {
       "name": "projectName",
