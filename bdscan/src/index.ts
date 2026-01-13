@@ -65,9 +65,11 @@ async function run() {
         /* Policy check */
         const failOnPolicySelection = core.getBooleanInput('fail-on-policy-violations', { required: false });
         const policyExclusionList = core.getInput('policy-exclusions', { required: false });
+        const policySeveritiesInput = core.getInput('policy-severities', { required: false });
         let policyList = policyExclusionList === '' ? [] : policyExclusionList.split(', ');
+        let policySeverities = policySeveritiesInput === '' ? [] : policySeveritiesInput.split(',').map(s => s.trim());
         if (failOnPolicySelection){
-            let policyCheck:IRiskState[] = await blackduckCheck.failOnPolicyViolations(blackDuckData, policyList);
+            let policyCheck:IRiskState[] = await blackduckCheck.failOnPolicyViolations(blackDuckData, policyList, policySeverities);
             policyCheck.forEach((riskAssessment) => {
                 if (riskAssessment.risk)
                 {

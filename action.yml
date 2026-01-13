@@ -28,7 +28,7 @@ inputs:
     required: false
     default: ''
   fail-on-license-risks:
-    description: 'Fail action on HIGH license risks'
+    description: 'Fail action on CRITICAL or HIGH license risks'
     required: false
     default: 'false'
   license-exclusions:
@@ -39,6 +39,10 @@ inputs:
     description: 'Fail action on policy violations'
     required: false
     default: 'false'
+  policy-severities:
+    description: 'Policy violation severities to check (BLOCKER,CRITICAL,MAJOR,MINOR,TRIVIAL). Leave empty to check all severities.'
+    required: false
+    default: ''
   policy-exclusions:
     description: 'Comma-separated list of policy names to exclude from checks'
     required: false

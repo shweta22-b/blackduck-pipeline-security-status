@@ -52,7 +52,7 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         try {
             let message: string;
             let result: IRiskState[] = [];
-            let licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh`;
+            let licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh&filter=licenseRisk%3Acritical`;
             let licenseRisks: IBlackDuckViolations = await this.getViolations(licenseUrl, this.bearerToken);
             let licenseCheck: boolean = licenseRisks.totalCount > 0 ? true : false;
             if (licenseCheck && exclusionList.length > 0) {
@@ -79,7 +79,7 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
     
-    async failOnPolicyViolations(versionDetails: IBlackDuckVersion, exclusionList: string[]): Promise<IRiskState[]> {
+    async failOnPolicyViolations(versionDetails: IBlackDuckVersion, exclusionList: string[], policySeverities: string[]): Promise<IRiskState[]> {
         console.log("Checking for policy violations...");
         try
         {
@@ -87,6 +87,15 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
             let message: string;
             let result: IRiskState[] = [];
             let policyUrl = `${versionDetails.items[0]._meta.href}/components?filter=bomPolicy%3Ain_violation`;
+            
+            // Add severity filters if specified
+            if (policySeverities && policySeverities.length > 0) {
+                const severityFilters = policySeverities.map(s => `filter=policySeverity%3A${s.toLowerCase()}`).join('&');
+                policyUrl += `&${severityFilters}`;
+                console.log(`Filtering policy violations by severities: ${policySeverities.join(', ')}`);
+            }
+            
+            console.log(`Querying policy violations at: ${policyUrl}`);
             let policyRisks: IBlackDuckViolations = await this.getViolations(policyUrl, this.bearerToken);
             let poilicyCheck: boolean = policyRisks.totalCount > 0 ? true : false;
             if (poilicyCheck && exclusionList.length > 0) {

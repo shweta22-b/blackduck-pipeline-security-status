@@ -80,7 +80,7 @@ var core = __importStar(__nccwpck_require__(7484));
 var BlackDuckCheck_1 = __nccwpck_require__(8006);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var bdUrl, bdToken, bdProjectName, bdVersionName, blackduckCheck, blackDuckData, hasFailures_1, failOnLicenseSelection, licenseExclusionsList, licenseList, licenseCheck, failOnSecuritySelection, securityExclusionList, securityList, securityCheck, failOnPolicySelection, policyExclusionList, policyList, policyCheck, err_1;
+        var bdUrl, bdToken, bdProjectName, bdVersionName, blackduckCheck, blackDuckData, hasFailures_1, failOnLicenseSelection, licenseExclusionsList, licenseList, licenseCheck, failOnSecuritySelection, securityExclusionList, securityList, securityCheck, failOnPolicySelection, policyExclusionList, policySeveritiesInput, policyList, policySeverities, policyCheck, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -136,9 +136,11 @@ function run() {
                 case 5:
                     failOnPolicySelection = core.getBooleanInput('fail-on-policy-violations', { required: false });
                     policyExclusionList = core.getInput('policy-exclusions', { required: false });
+                    policySeveritiesInput = core.getInput('policy-severities', { required: false });
                     policyList = policyExclusionList === '' ? [] : policyExclusionList.split(', ');
+                    policySeverities = policySeveritiesInput === '' ? [] : policySeveritiesInput.split(',').map(function (s) { return s.trim(); });
                     if (!failOnPolicySelection) return [3, 7];
-                    return [4, blackduckCheck.failOnPolicyViolations(blackDuckData, policyList)];
+                    return [4, blackduckCheck.failOnPolicyViolations(blackDuckData, policyList, policySeverities)];
                 case 6:
                     policyCheck = _a.sent();
                     policyCheck.forEach(function (riskAssessment) {
@@ -560,7 +562,7 @@ var BlackDuckCheck = (function (_super) {
                         _a.trys.push([1, 8, , 9]);
                         message = void 0;
                         result = [];
-                        licenseUrl = "".concat(bdData.items[0]._meta.href, "/components?filter=licenseRisk%3Ahigh");
+                        licenseUrl = "".concat(bdData.items[0]._meta.href, "/components?filter=licenseRisk%3Ahigh&filter=licenseRisk%3Acritical");
                         return [4, this.getViolations(licenseUrl, this.bearerToken)];
                     case 2:
                         licenseRisks = _a.sent();
@@ -597,9 +599,9 @@ var BlackDuckCheck = (function (_super) {
             });
         });
     };
-    BlackDuckCheck.prototype.failOnPolicyViolations = function (versionDetails, exclusionList) {
+    BlackDuckCheck.prototype.failOnPolicyViolations = function (versionDetails, exclusionList, policySeverities) {
         return __awaiter(this, void 0, void 0, function () {
-            var policyVersionRisk, message, result, policyUrl, policyRisks, poilicyCheck, riskAssessment, error_3;
+            var policyVersionRisk, message, result, policyUrl, severityFilters, policyRisks, poilicyCheck, riskAssessment, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -611,6 +613,12 @@ var BlackDuckCheck = (function (_super) {
                         message = void 0;
                         result = [];
                         policyUrl = "".concat(versionDetails.items[0]._meta.href, "/components?filter=bomPolicy%3Ain_violation");
+                        if (policySeverities && policySeverities.length > 0) {
+                            severityFilters = policySeverities.map(function (s) { return "filter=policySeverity%3A".concat(s.toLowerCase()); }).join('&');
+                            policyUrl += "&".concat(severityFilters);
+                            console.log("Filtering policy violations by severities: ".concat(policySeverities.join(', ')));
+                        }
+                        console.log("Querying policy violations at: ".concat(policyUrl));
                         return [4, this.getViolations(policyUrl, this.bearerToken)];
                     case 2:
                         policyRisks = _a.sent();
