@@ -1,0 +1,32 @@
+name: Black Duck Security Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  blackduck-scan:
+    name: Black Duck Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run Black Duck Security Scan
+        uses: ./
+        with:
+          blackduck-url: ${{ vars.BLACKDUCK_URL || 'allegion.blackducksoftware.com' }}
+          blackduck-token: ${{ secrets.BLACKDUCK_API_TOKEN }}
+          project-name: ${{ github.event.repository.name }}
+          version-name: ${{ github.ref_name }}
+          fail-on-security-risks: 'true'
+          fail-on-license-risks: 'true'
+          fail-on-policy-violations: 'true'
+          # Optionally add exclusions:
+          # security-exclusions: 'component-name-1, component-name-2'
+          # license-exclusions: 'MIT, Apache-2.0'
+          # policy-exclusions: 'policy-name-1'
