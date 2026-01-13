@@ -14,11 +14,16 @@ async function run() {
         // Mask the token in logs
         core.setSecret(bdToken);
         
+        console.log(`Checking Black Duck project: ${bdProjectName}`);
+        console.log(`Version: ${bdVersionName}`);
+        
         // Initialize Black Duck check
         const blackduckCheck = new BlackDuckCheck(bdToken, bdProjectName, bdVersionName, bdUrl);
         
         /* Run BlackDuck API Calls */
         let blackDuckData: IBlackDuckVersion = await blackduckCheck.callBlackDuckAPI();
+        
+        console.log(`Found version data: ${JSON.stringify(blackDuckData, null, 2)}`);
         
         /* Check licenses */
         const failOnLicenseSelection = core.getBooleanInput('fail-on-license-risks', { required: false });

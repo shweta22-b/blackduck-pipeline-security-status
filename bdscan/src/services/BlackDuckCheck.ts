@@ -18,7 +18,9 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
             let message: string;
             let result: IRiskState[] = [];
             let violationUrl = `${bdData.items[0]._meta.href}/components?filter=securityRisk%3Ahigh&filter=securityRisk%3Acritical`;
+            console.log(`Querying security risks at: ${violationUrl}`);
             let securityRisks: IBlackDuckViolations = await this.getViolations(violationUrl, this.bearerToken);
+            console.log(`Security risks found: ${securityRisks.totalCount}`);
             let severityCheck: boolean = securityRisks.totalCount > 0 ? true : false
             if (severityCheck && exclusionList.length > 0)
             {

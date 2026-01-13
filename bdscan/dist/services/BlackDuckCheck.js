@@ -71,9 +71,11 @@ var BlackDuckCheck = (function (_super) {
                         message = void 0;
                         result = [];
                         violationUrl = "".concat(bdData.items[0]._meta.href, "/components?filter=securityRisk%3Ahigh&filter=securityRisk%3Acritical");
+                        console.log("Querying security risks at: ".concat(violationUrl));
                         return [4, this.getViolations(violationUrl, this.bearerToken)];
                     case 2:
                         securityRisks = _a.sent();
+                        console.log("Security risks found: ".concat(securityRisks.totalCount));
                         severityCheck = securityRisks.totalCount > 0 ? true : false;
                         if (!(severityCheck && exclusionList.length > 0)) return [3, 4];
                         return [4, this.checkExclusions(exclusionList, securityRisks.items, securityRisks.totalCount, "security")];
