@@ -8,15 +8,9 @@ import { IRequestOptions } from '../src/models/IRequestOptions';
 import { BlackDuckCheck } from '../src/services/BlackDuckCheck';
 import { IBlackDuckProject } from '../src/models/IBlackDuckProject';
 import { DetectADOConstants } from '../src/lib/BlackDuckConstants'
-import * as manswer from 'azure-pipelines-task-lib/mock-answer';
-import * as trunner from 'azure-pipelines-task-lib/mock-run';
-import * as path from 'path';
 import { IBlackDuckVersion } from '../src/models/IBlackDuckVersion';
 import { IRiskState } from '../src/models/IRiskState';
 import { IBlackDuckViolations } from '../src/models/IBlackDuckViolations';
-
-const taskPath = path.join(__dirname, '..', 'index.js');
-let taskrunner: trunner.TaskMockRunner = new trunner.TaskMockRunner(taskPath);
 
 let mockBlackDuckToken: IBlackDuckToken = {
     bearerToken: "123456abc",
