@@ -1,0 +1,19 @@
+# Example CODEOWNERS file 
+# Update paths and owner handles as your repository evolves.
+
+# Set ownership for everything in the repo
+#* @{team_name}
+
+# Set ownership for documentation-related files
+#/docs/ @{team_name}
+
+# Set ownership for GitHub workflows
+#.github/workflows/ @{team_name}
+
+# Set ownership for scripts
+#/scripts/ @{team_name}
+
+# Set ownership for configuration files
+#*.yml @{team_name}
+
+# Feel free to add more specific entries below for subdirectories or particular files
