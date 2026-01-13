@@ -80,7 +80,7 @@ var core = __importStar(__nccwpck_require__(7484));
 var BlackDuckCheck_1 = __nccwpck_require__(8006);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var bdUrl, bdToken, bdProjectName, bdVersionName, blackduckCheck, blackDuckData, failOnLicenseSelection, licenseExclusionsList, licenseList, licenseCheck, failOnSecuritySelection, securityExclusionList, securityList, securityCheck, failOnPolicySelection, policyExclusionList, policyList, policyCheck, err_1;
+        var bdUrl, bdToken, bdProjectName, bdVersionName, blackduckCheck, blackDuckData, hasFailures_1, failOnLicenseSelection, licenseExclusionsList, licenseList, licenseCheck, failOnSecuritySelection, securityExclusionList, securityList, securityCheck, failOnPolicySelection, policyExclusionList, policyList, policyCheck, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -97,6 +97,7 @@ function run() {
                 case 1:
                     blackDuckData = _a.sent();
                     console.log("Found version data: ".concat(JSON.stringify(blackDuckData, null, 2)));
+                    hasFailures_1 = false;
                     failOnLicenseSelection = core.getBooleanInput('fail-on-license-risks', { required: false });
                     licenseExclusionsList = core.getInput('license-exclusions', { required: false });
                     licenseList = licenseExclusionsList === '' ? [] : licenseExclusionsList.split(', ');
@@ -106,7 +107,8 @@ function run() {
                     licenseCheck = _a.sent();
                     licenseCheck.forEach(function (riskAssessment) {
                         if (riskAssessment.risk) {
-                            core.setFailed(riskAssessment.message);
+                            core.error(riskAssessment.message);
+                            hasFailures_1 = true;
                         }
                         else {
                             core.info(riskAssessment.message);
@@ -123,7 +125,8 @@ function run() {
                     securityCheck = _a.sent();
                     securityCheck.forEach(function (riskAssessment) {
                         if (riskAssessment.risk) {
-                            core.setFailed(riskAssessment.message);
+                            core.error(riskAssessment.message);
+                            hasFailures_1 = true;
                         }
                         else {
                             core.info(riskAssessment.message);
@@ -140,7 +143,8 @@ function run() {
                     policyCheck = _a.sent();
                     policyCheck.forEach(function (riskAssessment) {
                         if (riskAssessment.risk) {
-                            core.setFailed(riskAssessment.message);
+                            core.error(riskAssessment.message);
+                            hasFailures_1 = true;
                         }
                         else {
                             core.info(riskAssessment.message);
@@ -148,7 +152,12 @@ function run() {
                     });
                     _a.label = 7;
                 case 7:
-                    core.info("Black Duck scan complete. No checks failed.");
+                    if (hasFailures_1) {
+                        core.setFailed("Black Duck scan found security risks, license risks, or policy violations.");
+                    }
+                    else {
+                        core.info("Black Duck scan complete. No checks failed.");
+                    }
                     return [3, 9];
                 case 8:
                     err_1 = _a.sent();

@@ -25,6 +25,8 @@ async function run() {
         
         console.log(`Found version data: ${JSON.stringify(blackDuckData, null, 2)}`);
         
+        let hasFailures = false;
+        
         /* Check licenses */
         const failOnLicenseSelection = core.getBooleanInput('fail-on-license-risks', { required: false });
         const licenseExclusionsList = core.getInput('license-exclusions', { required: false });
@@ -34,7 +36,8 @@ async function run() {
             licenseCheck.forEach((riskAssessment) => {
                 if (riskAssessment.risk)
                 {
-                    core.setFailed(riskAssessment.message);
+                    core.error(riskAssessment.message);
+                    hasFailures = true;
                 }
                 else {
                     core.info(riskAssessment.message);
@@ -50,7 +53,8 @@ async function run() {
             let securityCheck: IRiskState[] = await blackduckCheck.failOnSecurityRisks(blackDuckData, securityList);
             securityCheck.forEach((riskAssessment) => {
                 if (riskAssessment.risk){
-                    core.setFailed(riskAssessment.message);
+                    core.error(riskAssessment.message);
+                    hasFailures = true;
                 }
                 else{
                     core.info(riskAssessment.message);
@@ -67,7 +71,8 @@ async function run() {
             policyCheck.forEach((riskAssessment) => {
                 if (riskAssessment.risk)
                 {
-                    core.setFailed(riskAssessment.message);
+                    core.error(riskAssessment.message);
+                    hasFailures = true;
                 }
                 else
                 {
@@ -75,7 +80,12 @@ async function run() {
                 }
             })
         }
-        core.info("Black Duck scan complete. No checks failed.");
+        
+        if (hasFailures) {
+            core.setFailed("Black Duck scan found security risks, license risks, or policy violations.");
+        } else {
+            core.info("Black Duck scan complete. No checks failed.");
+        }
     }
     catch (err) {
         core.setFailed(err.message);
