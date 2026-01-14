@@ -1,11 +1,28 @@
+/**
+ * Black Duck Security Scan - GitHub Action Entry Point
+ * 
+ * This action scans Black Duck projects for:
+ * - Security vulnerabilities (CRITICAL/HIGH)
+ * - License risks (CRITICAL/HIGH)
+ * - Policy violations (configurable severities)
+ * 
+ * @author ProductTech
+ */
+
 import * as core from '@actions/core';
 import { IRiskState } from './models/IRiskState';
 import { IBlackDuckVersion } from './models/IBlackDuckVersion';
 import { BlackDuckCheck } from './services/BlackDuckCheck';
 
+/**
+ * Main execution function for the GitHub Action
+ * Orchestrates the Black Duck security scanning process
+ */
 async function run() {
     try {
-        // Get inputs from action.yml
+        // ========================================
+        // Step 1: Get and validate inputs
+        // ========================================
         const bdUrl = core.getInput('blackduck-url', { required: false }) || 'allegion.blackducksoftware.com';
         const bdToken = core.getInput('blackduck-token', { required: true });
         const bdProjectName = core.getInput('project-name', { required: true });
@@ -27,10 +44,13 @@ async function run() {
         
         let hasFailures = false;
         
-        /* Check licenses */
+        // ========================================
+        // Step 3: Check License Risks
+        // ========================================
         const failOnLicenseSelection = core.getBooleanInput('fail-on-license-risks', { required: false });
         const licenseExclusionsList = core.getInput('license-exclusions', { required: false });
         let licenseList = licenseExclusionsList === '' ? [] : licenseExclusionsList.split(', ');
+        
         if (failOnLicenseSelection){
             const licenseCheck = await blackduckCheck.failOnLicenseRisks(blackDuckData, licenseList);
             licenseCheck.forEach((riskAssessment) => {
@@ -45,10 +65,13 @@ async function run() {
             });
         }
 
-        /* Security check*/
+        // ========================================
+        // Step 4: Check Security Vulnerabilities
+        // ========================================
         const failOnSecuritySelection = core.getBooleanInput('fail-on-security-risks', { required: false });
         const securityExclusionList = core.getInput('security-exclusions', { required: false });
         let securityList = securityExclusionList === '' ? [] : securityExclusionList.split(', ');
+        
         if (failOnSecuritySelection){
             let securityCheck: IRiskState[] = await blackduckCheck.failOnSecurityRisks(blackDuckData, securityList);
             securityCheck.forEach((riskAssessment) => {
@@ -62,12 +85,15 @@ async function run() {
             });
         }
 
-        /* Policy check */
+        // ========================================
+        // Step 5: Check Policy Violations
+        // ========================================
         const failOnPolicySelection = core.getBooleanInput('fail-on-policy-violations', { required: false });
         const policyExclusionList = core.getInput('policy-exclusions', { required: false });
         const policySeveritiesInput = core.getInput('policy-severities', { required: false });
         let policyList = policyExclusionList === '' ? [] : policyExclusionList.split(', ');
         let policySeverities = policySeveritiesInput === '' ? [] : policySeveritiesInput.split(',').map(s => s.trim());
+        
         if (failOnPolicySelection){
             let policyCheck:IRiskState[] = await blackduckCheck.failOnPolicyViolations(blackDuckData, policyList, policySeverities);
             policyCheck.forEach((riskAssessment) => {
@@ -83,15 +109,20 @@ async function run() {
             })
         }
         
+        // ========================================
+        // Step 6: Report Final Results
+        // ========================================
         if (hasFailures) {
             core.setFailed("Black Duck scan found security risks, license risks, or policy violations.");
         } else {
-            core.info("Black Duck scan complete. No checks failed.");
+            core.info("✅ Black Duck scan complete. No checks failed.");
         }
     }
     catch (err) {
+        // Handle and report any errors that occurred during execution
         core.setFailed(err.message);
     }
 }
 
+// Execute the action
 run();

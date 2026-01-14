@@ -1,3 +1,10 @@
+# ========================================
+# Black Duck Security Scan GitHub Action
+# ========================================
+# Scans Black Duck projects for security vulnerabilities,
+# license risks, and policy violations during CI/CD pipelines
+# ========================================
+
 name: 'Black Duck Security Scan'
 description: 'Scan Black Duck projects for security vulnerabilities, license risks, and policy violations'
 author: 'ProductTech'
@@ -5,6 +12,9 @@ branding:
   icon: 'shield'
   color: 'blue'
 
+# ========================================
+# Input Parameters
+# ========================================
 inputs:
   blackduck-url:
     description: 'Black Duck server URL (e.g., allegion.blackducksoftware.com)'
@@ -48,6 +58,9 @@ inputs:
     required: false
     default: ''
 
+# ========================================
+# Action Runtime Configuration
+# ========================================
 runs:
   using: 'node20'
   main: 'bdscan/dist/index.js'

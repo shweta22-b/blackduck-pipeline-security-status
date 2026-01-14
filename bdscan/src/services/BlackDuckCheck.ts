@@ -1,3 +1,14 @@
+/**
+ * BlackDuckCheck - Service for Black Duck security analysis
+ * 
+ * Performs security checks on Black Duck projects including:
+ * - Security vulnerability scanning (CRITICAL/HIGH)
+ * - License risk assessment (CRITICAL/HIGH)
+ * - Policy violation detection
+ * 
+ * Supports exclusion lists for components, licenses, and policies
+ */
+
 import { IBlackDuckToken } from '../models/IBlackDuckToken';
 import { IBlackDuckProject } from '../models/IBlackDuckProject';
 import { IBlackDuckVersion } from '../models/IBlackDuckVersion';
@@ -12,6 +23,12 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         super(_bdToken, _bdProjectName, _bdVersionName, _baseUrl);
     }
 
+    /**
+     * Check for CRITICAL and HIGH security vulnerabilities
+     * @param bdData - Black Duck version data containing component information
+     * @param exclusionList - List of component names to exclude from security checks
+     * @returns Array of risk assessment results
+     */
     async failOnSecurityRisks(bdData: IBlackDuckVersion, exclusionList:string[] ): Promise<IRiskState[]> {
         console.log("Checking for security risks...");
         try {
@@ -51,6 +68,12 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
 
+    /**
+     * Check for CRITICAL and HIGH license risks
+     * @param bdData - Black Duck version data containing component information
+     * @param exclusionList - List of license names to exclude from license checks
+     * @returns Array of risk assessment results
+     */
     async failOnLicenseRisks(bdData: IBlackDuckVersion, exclusionList: string[]): Promise<IRiskState[]> {
         console.log("Checking for license risks...");
         try {
@@ -87,6 +110,13 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         }
     }
     
+    /**
+     * Check for policy violations with configurable severity filtering
+     * @param versionDetails - Black Duck version details
+     * @param exclusionList - List of policy names to exclude from checks
+     * @param policySeverities - List of policy severities to check (e.g., BLOCKER, CRITICAL)
+     * @returns Array of risk assessment results
+     */
     async failOnPolicyViolations(versionDetails: IBlackDuckVersion, exclusionList: string[], policySeverities: string[]): Promise<IRiskState[]> {
         console.log("Checking for policy violations...");
         try

@@ -1,3 +1,12 @@
+/**
+ * BlackDuckAPICalls - Service for Black Duck API interactions
+ * 
+ * Handles all HTTP communication with Black Duck server including:
+ * - Authentication and token management
+ * - Project and version querying
+ * - Violations and risks retrieval
+ */
+
 import { BlackDuckCheck } from "./BlackDuckCheck";
 import { IBlackDuckVersion } from "../models/IBlackDuckVersion";
 import { IRequestOptions } from "../models/IRequestOptions";
@@ -13,6 +22,13 @@ export class BlackDuckAPICalls {
     public bdVersionName: string;
     public baseUrl: string;
 
+    /**
+     * Initialize Black Duck API client
+     * @param _bdToken - API token for authentication
+     * @param _bdProjectName - Name of the Black Duck project
+     * @param _bdVersionName - Version name to scan
+     * @param _baseUrl - Black Duck server URL
+     */
     constructor(_bdToken: string, _bdProjectName: string, _bdVersionName: string, _baseUrl: string) {
         this.bdToken = _bdToken;
         this.bdProjectName = _bdProjectName;
@@ -20,6 +36,12 @@ export class BlackDuckAPICalls {
         this.baseUrl = _baseUrl.replace(/^https:\/\//, "").replace(/\/$/, '');
     }
 
+    /**
+     * Authenticate with Black Duck API and get bearer token
+     * @param _baseUrl - Black Duck server base URL
+     * @param _bdToken - API token
+     * @returns Bearer token for subsequent API calls
+     */
     async authenticate(_baseUrl, _bdToken: string): Promise<string> {
         console.log("Authenticating...");
         let options: IRequestOptions = {
@@ -36,6 +58,12 @@ export class BlackDuckAPICalls {
         return bearerResponse.bearerToken;
     }
 
+    /**
+     * Retrieve Black Duck project details
+     * @param _url - API endpoint URL for projects
+     * @param _bearerToken - Bearer token for authentication
+     * @returns Project details
+     */
     async getProjects(_url: string, _bearerToken: string): Promise<IBlackDuckProject> {
         console.log("Get Projects...");
         let options: IRequestOptions = {

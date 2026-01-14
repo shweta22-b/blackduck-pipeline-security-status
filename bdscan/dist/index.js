@@ -158,7 +158,7 @@ function run() {
                         core.setFailed("Black Duck scan found security risks, license risks, or policy violations.");
                     }
                     else {
-                        core.info("Black Duck scan complete. No checks failed.");
+                        core.info("✅ Black Duck scan complete. No checks failed.");
                     }
                     return [3, 9];
                 case 8:
