@@ -16,6 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      - name: Setup npm authentication
+        run: |
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=${{ secrets.AZURE_DEVOPS_PAT }}" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./bdscan
+
       - name: Run Black Duck Security Scan
         uses: ./
         with:
