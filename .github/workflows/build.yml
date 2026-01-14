@@ -43,7 +43,7 @@ jobs:
       
       - name: Install dependencies
         working-directory: ./bdscan
-        run: npm ci --verbose 2>&1 | grep -E "allepackage|registry.npmjs.org" || npm ci
+        run: npm ci --no-audit --verbose 2>&1 | grep -E "allepackage|registry.npmjs.org|added.*packages" || npm ci --no-audit
       
       - name: Run tests
         working-directory: ./bdscan
