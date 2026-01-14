@@ -24,11 +24,20 @@ jobs:
       
       - name: Setup Azure DevOps npm authentication
         working-directory: ./bdscan
+        env:
+          AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
         run: |
-          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=${{ secrets.AZURE_DEVOPS_PAT }}" >> .npmrc
+          if [ -z "$AZURE_PAT" ]; then
+            echo "::error::AZURE_DEVOPS_PAT secret is not set!"
+            echo "Please add the secret in GitHub repository settings"
+            exit 1
+          fi
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$AZURE_PAT" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
           echo "✓ Azure DevOps npm authentication configured"
+          echo "Registry configuration:"
+          grep "registry=" .npmrc || echo "No registry found in .npmrc"
       
       - name: Install dependencies
         working-directory: ./bdscan
