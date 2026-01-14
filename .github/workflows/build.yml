@@ -32,14 +32,11 @@ jobs:
             echo "Please add the secret in GitHub repository settings"
             exit 1
           fi
-          # Create .npmrc with allepackage registry configuration
-          cat > .npmrc << EOF
-registry=https://pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/
-always-auth=true
-//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$AZURE_PAT
-//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit
-//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com
-EOF
+          echo "registry=https://pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/" > .npmrc
+          echo "always-auth=true" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$AZURE_PAT" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
           echo "✓ Azure DevOps npm authentication configured"
           echo "Registry configuration:"
           grep "registry=" .npmrc
