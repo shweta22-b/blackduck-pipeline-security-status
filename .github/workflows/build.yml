@@ -22,6 +22,14 @@ jobs:
           cache: 'npm'
           cache-dependency-path: bdscan/package.json
       
+      - name: Setup Azure DevOps npm authentication
+        working-directory: ./bdscan
+        run: |
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=${{ secrets.AZURE_DEVOPS_PAT }}" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
+          echo "✓ Azure DevOps npm authentication configured"
+      
       - name: Install dependencies
         working-directory: ./bdscan
         run: npm ci
