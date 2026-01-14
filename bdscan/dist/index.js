@@ -420,6 +420,9 @@ var BlackDuckAPICalls = (function () {
                         return [4, this.getProjects(projectUrl, this.bearerToken)];
                     case 2:
                         projectDetails = _b.sent();
+                        if (!projectDetails || !projectDetails.items || projectDetails.items.length === 0) {
+                            throw new Error("Project '".concat(this.bdProjectName, "' not found in Black Duck"));
+                        }
                         versionUrl = "".concat(projectDetails.items[0]._meta.href, "/versions?q=versionName:").concat(this.bdVersionName);
                         return [4, this.getVersions(versionUrl, this.bearerToken)];
                     case 3:
@@ -510,6 +513,9 @@ var BlackDuckCheck = (function (_super) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 8, , 9]);
+                        if (!bdData || !bdData.items || bdData.items.length === 0) {
+                            throw new Error("Version data not found or empty");
+                        }
                         message = void 0;
                         result = [];
                         violationUrl = "".concat(bdData.items[0]._meta.href, "/components?filter=securityRisk%3Ahigh&filter=securityRisk%3Acritical");
@@ -560,6 +566,9 @@ var BlackDuckCheck = (function (_super) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 8, , 9]);
+                        if (!bdData || !bdData.items || bdData.items.length === 0) {
+                            throw new Error("Version data not found or empty");
+                        }
                         message = void 0;
                         result = [];
                         licenseUrl = "".concat(bdData.items[0]._meta.href, "/components?filter=licenseRisk%3Ahigh&filter=licenseRisk%3Acritical");
@@ -609,6 +618,9 @@ var BlackDuckCheck = (function (_super) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 8, , 9]);
+                        if (!versionDetails || !versionDetails.items || versionDetails.items.length === 0) {
+                            throw new Error("Version details not found or empty");
+                        }
                         policyVersionRisk = versionDetails.items[0].policyStatusSummaries;
                         message = void 0;
                         result = [];

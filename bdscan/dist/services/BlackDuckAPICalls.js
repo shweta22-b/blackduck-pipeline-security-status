@@ -239,6 +239,9 @@ var BlackDuckAPICalls = (function () {
                         return [4, this.getProjects(projectUrl, this.bearerToken)];
                     case 2:
                         projectDetails = _b.sent();
+                        if (!projectDetails || !projectDetails.items || projectDetails.items.length === 0) {
+                            throw new Error("Project '".concat(this.bdProjectName, "' not found in Black Duck"));
+                        }
                         versionUrl = "".concat(projectDetails.items[0]._meta.href, "/versions?q=versionName:").concat(this.bdVersionName);
                         return [4, this.getVersions(versionUrl, this.bearerToken)];
                     case 3:

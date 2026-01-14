@@ -140,6 +140,11 @@ export class BlackDuckAPICalls {
         this.bearerToken = await this.authenticate(this.baseUrl, this.bdToken);
         let projectUrl = `https://${this.baseUrl}/api/projects?q=name:${this.bdProjectName}`;
         const projectDetails = await this.getProjects(projectUrl, this.bearerToken);
+        
+        if (!projectDetails || !projectDetails.items || projectDetails.items.length === 0) {
+            throw new Error(`Project '${this.bdProjectName}' not found in Black Duck`);
+        }
+        
         const versionUrl = `${projectDetails.items[0]._meta.href}/versions?q=versionName:${this.bdVersionName}`;
         let versionDetails: IBlackDuckVersion = await this.getVersions(versionUrl, this.bearerToken);
         return versionDetails

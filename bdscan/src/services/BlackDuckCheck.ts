@@ -15,6 +15,10 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
     async failOnSecurityRisks(bdData: IBlackDuckVersion, exclusionList:string[] ): Promise<IRiskState[]> {
         console.log("Checking for security risks...");
         try {
+            if (!bdData || !bdData.items || bdData.items.length === 0) {
+                throw new Error(`Version data not found or empty`);
+            }
+            
             let message: string;
             let result: IRiskState[] = [];
             let violationUrl = `${bdData.items[0]._meta.href}/components?filter=securityRisk%3Ahigh&filter=securityRisk%3Acritical`;
@@ -50,6 +54,10 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
     async failOnLicenseRisks(bdData: IBlackDuckVersion, exclusionList: string[]): Promise<IRiskState[]> {
         console.log("Checking for license risks...");
         try {
+            if (!bdData || !bdData.items || bdData.items.length === 0) {
+                throw new Error(`Version data not found or empty`);
+            }
+            
             let message: string;
             let result: IRiskState[] = [];
             let licenseUrl = `${bdData.items[0]._meta.href}/components?filter=licenseRisk%3Ahigh&filter=licenseRisk%3Acritical`;
@@ -83,6 +91,10 @@ export class BlackDuckCheck extends BlackDuckAPICalls {
         console.log("Checking for policy violations...");
         try
         {
+            if (!versionDetails || !versionDetails.items || versionDetails.items.length === 0) {
+                throw new Error(`Version details not found or empty`);
+            }
+            
             let policyVersionRisk = versionDetails.items[0].policyStatusSummaries; 
             let message: string;
             let result: IRiskState[] = [];
