@@ -16,17 +16,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Setup npm authentication
+      - name: Setup Azure DevOps npm authentication
+        working-directory: ./bdscan
+        env:
+          AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
         run: |
-          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=${{ secrets.AZURE_DEVOPS_PAT }}" >> .npmrc
+          if [ -z "$AZURE_PAT" ]; then
+            echo "::error::AZURE_DEVOPS_PAT secret is not set!"
+            exit 1
+          fi
+          echo "registry=https://pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/" > .npmrc
+          echo "always-auth=true" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$AZURE_PAT" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
 
       - name: Install dependencies
-        run: npm install
         working-directory: ./bdscan
+        run: npm ci --no-audit
 
-      - name: Run Black Duck Security Scan
+      - name: Validate Black Duck Token
+        env:
+          BLACKDUCK_TOKEN: ${{ secrets.BLACKDUCK_API_TOKEN }}
+        run: |
+          if [ -z "$BLACKDUCK_TOKEN" ]; then
+            echo "::warning::BLACKDUCK_API_TOKEN secret is not set. Skipping Black Duck scan."
+            echo "To enable scanning, add BLACKDUCK_API_TOKEN secret in repository settings."
+            echo "skip_scan=true" >> $GITHUB_ENV
+          else
+            echo "skip_scan=false" >> $GITHUB_ENV
+          fi
+        
+      - name: Execute Black Duck Scan
+        if: env.skip_scan == 'false'
         uses: ./
         with:
           blackduck-url: ${{ vars.BLACKDUCK_URL || 'allegion.blackducksoftware.com' }}
@@ -36,7 +58,3 @@ jobs:
           fail-on-security-risks: 'true'
           fail-on-license-risks: 'true'
           fail-on-policy-violations: 'true'
-          # Optionally add exclusions:
-          # security-exclusions: 'component-name-1, component-name-2'
-          # license-exclusions: 'MIT, Apache-2.0'
-          # policy-exclusions: 'policy-name-1'
