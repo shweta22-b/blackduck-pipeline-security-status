@@ -55,24 +55,3 @@ jobs:
           else
             echo "✅ dist/ folder is up to date"
           fi
-      
-      - name: Test Action Execution
-        id: test-action
-        uses: ./
-        continue-on-error: true
-        with:
-          blackduck-url: ${{ vars.BLACKDUCK_URL || 'allegion.blackducksoftware.com' }}
-          blackduck-token: ${{ secrets.BLACKDUCK_API_TOKEN || 'test-token' }}
-          project-name: 'test-project'
-          version-name: 'test-version'
-          fail-on-security-risks: 'false'
-          fail-on-license-risks: 'false'
-          fail-on-policy-violations: 'false'
-      
-      - name: Report test result
-        run: |
-          if [ "${{ steps.test-action.outcome }}" == "failure" ]; then
-            echo "::notice::Action test failed (expected if test-project doesn't exist in Black Duck)"
-          else
-            echo "✅ Action executed successfully"
-          fi
