@@ -30,13 +30,16 @@ jobs:
             echo "::error::AZURE_DEVOPS_PAT secret is not set!"
             exit 1
           fi
-          # Base64 encode the PAT for Azure DevOps npm authentication
-          ENCODED_PAT=$(echo -n ":$AZURE_PAT" | base64)
+          # Azure DevOps requires base64 encoding of :<PAT>
+          ENCODED_PAT=$(printf ":%s" "$AZURE_PAT" | base64 -w 0)
           echo "registry=https://pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/" > .npmrc
           echo "always-auth=true" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$ENCODED_PAT" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/:username=allegionit" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/:_password=$ENCODED_PAT" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/:email=npm@allegion.com" >> .npmrc
       
       - name: Install dependencies
         working-directory: ./bdscan
