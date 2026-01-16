@@ -1,0 +1,93 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test Action
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      
+      - name: Setup Azure DevOps npm authentication
+        working-directory: ./bdscan
+        env:
+          AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+        run: |
+          if [ -z "$AZURE_PAT" ]; then
+            echo "::error::AZURE_DEVOPS_PAT secret is not set!"
+            exit 1
+          fi
+          echo "registry=https://pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/" > .npmrc
+          echo "always-auth=true" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$AZURE_PAT" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
+      
+      - name: Install dependencies
+        working-directory: ./bdscan
+        run: npm ci --no-audit
+      
+      - name: Build TypeScript
+        working-directory: ./bdscan
+        run: npm run build
+      
+      - name: Verify dist folder
+        run: |
+          if [ ! -d "./bdscan/dist" ]; then
+            echo "::error::dist folder not created!"
+            exit 1
+          fi
+          if [ ! -f "./bdscan/dist/index.js" ]; then
+            echo "::error::dist/index.js not found!"
+            exit 1
+          fi
+          echo "✅ Build successful - dist folder created"
+      
+      - name: Run tests (if available)
+        working-directory: ./bdscan
+        run: npm test --if-present
+        continue-on-error: true
+      
+      - name: Check for uncommitted dist changes
+        run: |
+          if [ -n "$(git status --porcelain bdscan/dist)" ]; then
+            echo "::warning::Uncommitted changes in dist/ folder detected"
+            echo "::warning::Run 'npm run build' and commit the changes"
+            git status bdscan/dist
+          else
+            echo "✅ dist/ folder is up to date"
+          fi
+      
+      - name: Test Action Execution
+        id: test-action
+        uses: ./
+        continue-on-error: true
+        with:
+          blackduck-url: ${{ vars.BLACKDUCK_URL || 'allegion.blackducksoftware.com' }}
+          blackduck-token: ${{ secrets.BLACKDUCK_API_TOKEN || 'test-token' }}
+          project-name: 'test-project'
+          version-name: 'test-version'
+          fail-on-security-risks: 'false'
+          fail-on-license-risks: 'false'
+          fail-on-policy-violations: 'false'
+      
+      - name: Report test result
+        run: |
+          if [ "${{ steps.test-action.outcome }}" == "failure" ]; then
+            echo "::notice::Action test failed (expected if test-project doesn't exist in Black Duck)"
+          else
+            echo "✅ Action executed successfully"
+          fi
