@@ -30,9 +30,11 @@ jobs:
             echo "::error::AZURE_DEVOPS_PAT secret is not set!"
             exit 1
           fi
+          # Base64 encode the PAT for Azure DevOps npm authentication
+          ENCODED_PAT=$(echo -n ":$AZURE_PAT" | base64)
           echo "registry=https://pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/" > .npmrc
           echo "always-auth=true" >> .npmrc
-          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$AZURE_PAT" >> .npmrc
+          echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:_password=$ENCODED_PAT" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:username=allegionit" >> .npmrc
           echo "//pkgs.dev.azure.com/allegionit/_packaging/allepackage/npm/registry/:email=npm@allegion.com" >> .npmrc
       
