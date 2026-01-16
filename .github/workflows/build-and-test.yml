@@ -28,8 +28,6 @@ jobs:
         run: npm ci --no-audit
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AZURE_DEVOPS_PAT }}
-        working-directory: ./bdscan
-        run: npm ci --no-audit
       
       - name: Build TypeScript
         working-directory: ./bdscan
