@@ -103,9 +103,9 @@ export class BlackDuckAPICalls {
     async request(options: IRequestOptions): Promise<any> {
         return new Promise((resolve, reject) => {
             const req = https.request(options, (res) => {
-                if (res.statusCode > 200 && res.statusCode < 300)
+                if (res.statusCode < 200 || res.statusCode >= 300)
                 {
-                    return reject(new Error(`status code ${res.statusCode}`));
+                    return reject(new Error(`HTTP ${res.statusCode}: Request failed`));
                 }
                 let body = [];
                 let response;
@@ -135,9 +135,9 @@ export class BlackDuckAPICalls {
     async getRequest(url: string, options: IRequestOptions): Promise<any> {
         return new Promise((resolve, reject) => {
             const req = https.get(url, options, (res) => {
-                if (res.statusCode > 200 && res.statusCode < 300)
+                if (res.statusCode < 200 || res.statusCode >= 300)
                 {
-                    return reject(new Error(`status code ${res.statusCode}`));
+                    return reject(new Error(`HTTP ${res.statusCode}: Request failed`));
                 }
                 let body = [];
                 let response;
@@ -175,6 +175,11 @@ export class BlackDuckAPICalls {
         
         const versionUrl = `${projectDetails.items[0]._meta.href}/versions?q=versionName:${this.bdVersionName}`;
         let versionDetails: IBlackDuckVersion = await this.getVersions(versionUrl, this.bearerToken);
+        
+        if (!versionDetails || !versionDetails.items || versionDetails.items.length === 0) {
+            throw new Error(`Version '${this.bdVersionName}' not found in project '${this.bdProjectName}'`);
+        }
+        
         return versionDetails
     }
 }

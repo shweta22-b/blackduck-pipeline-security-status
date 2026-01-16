@@ -80,7 +80,7 @@ var core = __importStar(__nccwpck_require__(7484));
 var BlackDuckCheck_1 = __nccwpck_require__(8006);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var bdUrl, bdToken, bdProjectName, bdVersionName, blackduckCheck, blackDuckData, hasFailures_1, failOnLicenseSelection, licenseExclusionsList, licenseList, licenseCheck, failOnSecuritySelection, securityExclusionList, securityList, securityCheck, failOnPolicySelection, policyExclusionList, policySeveritiesInput, policyList, policySeverities, policyCheck, err_1;
+        var bdUrl, bdToken, bdProjectName, bdVersionName, blackduckCheck, blackDuckData, hasFailures_1, failOnLicenseSelection, licenseExclusionsList, licenseList, licenseCheck, failOnSecuritySelection, securityExclusionList, securityList, securityCheck, failOnPolicySelection, policyExclusionList, policySeveritiesInput, policyList, policySeverities, policyCheck, err_1, errorMessage;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -163,7 +163,8 @@ function run() {
                     return [3, 9];
                 case 8:
                     err_1 = _a.sent();
-                    core.setFailed(err_1.message);
+                    errorMessage = err_1 instanceof Error ? err_1.message : String(err_1);
+                    core.setFailed(errorMessage);
                     return [3, 9];
                 case 9: return [2];
             }
@@ -349,8 +350,8 @@ var BlackDuckAPICalls = (function () {
             return __generator(this, function (_a) {
                 return [2, new Promise(function (resolve, reject) {
                         var req = https.request(options, function (res) {
-                            if (res.statusCode > 200 && res.statusCode < 300) {
-                                return reject(new Error("status code ".concat(res.statusCode)));
+                            if (res.statusCode < 200 || res.statusCode >= 300) {
+                                return reject(new Error("HTTP ".concat(res.statusCode, ": Request failed")));
                             }
                             var body = [];
                             var response;
@@ -380,8 +381,8 @@ var BlackDuckAPICalls = (function () {
             return __generator(this, function (_a) {
                 return [2, new Promise(function (resolve, reject) {
                         var req = https.get(url, options, function (res) {
-                            if (res.statusCode > 200 && res.statusCode < 300) {
-                                return reject(new Error("status code ".concat(res.statusCode)));
+                            if (res.statusCode < 200 || res.statusCode >= 300) {
+                                return reject(new Error("HTTP ".concat(res.statusCode, ": Request failed")));
                             }
                             var body = [];
                             var response;
@@ -427,6 +428,9 @@ var BlackDuckAPICalls = (function () {
                         return [4, this.getVersions(versionUrl, this.bearerToken)];
                     case 3:
                         versionDetails = _b.sent();
+                        if (!versionDetails || !versionDetails.items || versionDetails.items.length === 0) {
+                            throw new Error("Version '".concat(this.bdVersionName, "' not found in project '").concat(this.bdProjectName, "'"));
+                        }
                         return [2, versionDetails];
                 }
             });

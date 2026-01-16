@@ -168,8 +168,8 @@ var BlackDuckAPICalls = (function () {
             return __generator(this, function (_a) {
                 return [2, new Promise(function (resolve, reject) {
                         var req = https.request(options, function (res) {
-                            if (res.statusCode > 200 && res.statusCode < 300) {
-                                return reject(new Error("status code ".concat(res.statusCode)));
+                            if (res.statusCode < 200 || res.statusCode >= 300) {
+                                return reject(new Error("HTTP ".concat(res.statusCode, ": Request failed")));
                             }
                             var body = [];
                             var response;
@@ -199,8 +199,8 @@ var BlackDuckAPICalls = (function () {
             return __generator(this, function (_a) {
                 return [2, new Promise(function (resolve, reject) {
                         var req = https.get(url, options, function (res) {
-                            if (res.statusCode > 200 && res.statusCode < 300) {
-                                return reject(new Error("status code ".concat(res.statusCode)));
+                            if (res.statusCode < 200 || res.statusCode >= 300) {
+                                return reject(new Error("HTTP ".concat(res.statusCode, ": Request failed")));
                             }
                             var body = [];
                             var response;
@@ -246,6 +246,9 @@ var BlackDuckAPICalls = (function () {
                         return [4, this.getVersions(versionUrl, this.bearerToken)];
                     case 3:
                         versionDetails = _b.sent();
+                        if (!versionDetails || !versionDetails.items || versionDetails.items.length === 0) {
+                            throw new Error("Version '".concat(this.bdVersionName, "' not found in project '").concat(this.bdProjectName, "'"));
+                        }
                         return [2, versionDetails];
                 }
             });

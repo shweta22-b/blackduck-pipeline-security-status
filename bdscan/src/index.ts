@@ -120,7 +120,8 @@ async function run() {
     }
     catch (err) {
         // Handle and report any errors that occurred during execution
-        core.setFailed(err.message);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        core.setFailed(errorMessage);
     }
 }
 
