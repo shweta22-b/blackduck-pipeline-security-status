@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'PUBLISHING.md'
+      - 'QUICK_COMMANDS.md'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: |
+          cd bdscan
+          npm ci
+      
+      - name: Run tests
+        run: |
+          cd bdscan
+          npm test
+      
+      - name: Build action
+        run: |
+          cd bdscan
+          npm run build
+      
+      - name: Verify dist exists
+        run: |
+          if [ ! -f "bdscan/dist/index.js" ]; then
+            echo "Error: dist/index.js not found!"
+            exit 1
+          fi
+          echo "Build successful - dist/index.js created"
+      
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./bdscan/package.json').version")
+          echo "VERSION=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: v$VERSION"
+      
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "refs/tags/${{ steps.get_version.outputs.VERSION }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.get_version.outputs.VERSION }} already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.get_version.outputs.VERSION }} does not exist, will create release"
+          fi
+      
+      - name: Commit built files
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add bdscan/dist/
+          git diff --staged --quiet || git commit -m "chore: update built action for ${{ steps.get_version.outputs.VERSION }}"
+      
+      - name: Create and push tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git tag -a ${{ steps.get_version.outputs.VERSION }} -m "Release ${{ steps.get_version.outputs.VERSION }}"
+          git push origin ${{ steps.get_version.outputs.VERSION }}
+      
+      - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Changes in ${{ steps.get_version.outputs.VERSION }}
+            
+            See [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/README.md#changelog) for details.
+            
+            ## Installation
+            
+            ```yaml
+            - uses: ${{ github.repository }}@${{ steps.get_version.outputs.VERSION }}
+              with:
+                blackduck-token: ${{ secrets.BLACKDUCK_API_TOKEN }}
+                project-name: 'your-project'
+                version-name: 'your-version'
+            ```
+          draft: false
+          prerelease: false
+      
+      - name: Update major version tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+          git tag -fa $MAJOR_VERSION -m "Update $MAJOR_VERSION tag to $VERSION"
+          git push origin $MAJOR_VERSION --force
+          echo "Updated $MAJOR_VERSION tag to point to $VERSION"

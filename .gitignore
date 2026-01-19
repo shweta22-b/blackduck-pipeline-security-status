@@ -1,4 +1,29 @@
+# Dependencies
 node_modules
+
+# VS Code Extension Package
 *.vsix
+
+# NPM Config
 .npmrc
 bdscan/.npmrc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Build (DO NOT IGNORE bdscan/dist - it must be committed!)
+# Only ignore test/temp build artifacts
+*.log
+npm-debug.log*

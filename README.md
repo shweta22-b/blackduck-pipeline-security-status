@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Black Duck Security Scan
-        uses: ./
+        uses: YourOrg/blackduck-pipeline-security-status@v1
         with:
           blackduck-token: ${{ secrets.BLACKDUCK_API_TOKEN }}
           project-name: 'my-project'
@@ -40,7 +40,7 @@ jobs:
 
 ```yaml
 - name: Black Duck Security Scan
-  uses: ./
+  uses: YourOrg/blackduck-pipeline-security-status@v1
   with:
     blackduck-url: 'your-instance.blackducksoftware.com'
     blackduck-token: ${{ secrets.BLACKDUCK_API_TOKEN }}
@@ -114,16 +114,42 @@ npm install
 npm run build
 ```
 
+The build process:
+1. Compiles TypeScript to JavaScript
+2. Bundles all dependencies using @vercel/ncc
+3. Creates a single `dist/index.js` file
+
+**Note**: The `dist/` folder is committed to the repository so users don't need to build the action themselves.
+
 ### Running Tests
 
 ```bash
+cd bdscan
 npm test
 ```
 
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and build
+5. Commit the built `dist/` folder
+6. Submit a pull request
+
 ## License
 
-ISC
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
 For issues and questions, please open an issue in the repository.
+
+## Changelog
+
+### v1.0.0 (2026-01-19)
+- Initial release
+- Security vulnerability scanning
+- License risk detection
+- Policy violation checks
+- Flexible exclusion support
